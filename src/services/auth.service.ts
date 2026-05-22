@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'segredo-provisorio';
 
 export const autenticarUsuario = async (email: string, senhaNua: string) => {
-    const user = await prisma.users.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     
     if (!user) {
         throw new Error("Credenciais inválidas"); 
@@ -16,7 +16,7 @@ export const autenticarUsuario = async (email: string, senhaNua: string) => {
         throw new Error("Credenciais inválidas");
     }
     const token = jwt.sign(
-        { id: user.id, id_telegram: user.id_telegram },
+        { id: user.id},
         JWT_SECRET, 
         { expiresIn: '24h' }
     );
