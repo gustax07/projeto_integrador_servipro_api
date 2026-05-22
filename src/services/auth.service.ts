@@ -1,0 +1,25 @@
+import { prisma } from '../lib/prisma';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'segredo-provisorio';
+
+export const autenticarUsuario = async (email: string, senhaNua: string) => {
+    const user = await prisma.users.findUnique({ where: { email } });
+    
+    if (!user) {
+        throw new Error("Credenciais inválidas"); 
+    }
+    const senhaCorreta = await bcrypt.compare(senhaNua, user.senha);
+    
+    if (!senhaCorreta) {
+        throw new Error("Credenciais inválidas");
+    }
+    const token = jwt.sign(
+        { id: user.id, id_telegram: user.id_telegram },
+        JWT_SECRET, 
+        { expiresIn: '24h' }
+    );
+
+    return token;
+}
