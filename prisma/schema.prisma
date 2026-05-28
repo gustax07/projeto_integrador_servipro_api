@@ -52,7 +52,7 @@ model Endereco {
 model Telefone {
   id      Int    @id @default(autoincrement())
   ddd     Int
-  numero  Int
+  numero  Int    @unique
   
   userId  Int    @map("user_id")
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -100,7 +100,7 @@ model Setor {
 
 model Servico {
   id           Int           @id @default(autoincrement())
-  titulo       String
+  titulo       String        @unique
   dataPostagem DateTime      @default(now()) @map("data_postagem")
   formato      String        // Ex: "Presencial", "Remoto"
   descricao    String        @db.Text
