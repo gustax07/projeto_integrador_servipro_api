@@ -7,6 +7,8 @@ import helmet from 'helmet';
 import morgan from 'morgan'
 import Logger from './config/logger';
 import routes from './routes';
+import swaggerUi from 'swagger-ui-express';
+import {swaggerDocs} from './config/swagger';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,7 +25,7 @@ const stream = {
 };
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms', { stream }));
-
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(routes)
 // Start server
 app.listen(port, () => {

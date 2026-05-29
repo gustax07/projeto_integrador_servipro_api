@@ -9,6 +9,7 @@ export const createUser = async (data: Prisma.UserCreateInput) => {
             data: {
                 ...data,
                 senha: hashedPassword,
+                dataNascimento: new Date(data.dataNascimento),
             },
             select: {
                 id: true,
@@ -25,7 +26,7 @@ export const createUser = async (data: Prisma.UserCreateInput) => {
 
 export const getUserById = async (id: number) => {
     try {
-        return await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 id
             },
@@ -33,6 +34,11 @@ export const getUserById = async (id: number) => {
                 senha: true,
             }
         })
+
+        if (!user) {
+            throw new Error('Usuário não encontrado.')
+        }
+        return user;
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         throw error;
@@ -42,7 +48,7 @@ export const getUserById = async (id: number) => {
 export const getAllUsers = async (page: number = 1, limit: number = 20) => {
     try {
         const skip = (page - 1) * limit;
-        return await prisma.user.findMany({
+        const user = await prisma.user.findMany({
             skip,
             take: limit,
             orderBy: {
@@ -53,6 +59,11 @@ export const getAllUsers = async (page: number = 1, limit: number = 20) => {
                 documento: true
             }
         })
+
+        if (!user) {
+            throw new Error('Nenhum usuário encontrado.')
+        }
+        return user;
     } catch (error) {
         console.error('Erro ao buscar usuários:', error);
         throw error;

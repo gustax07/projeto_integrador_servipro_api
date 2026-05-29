@@ -12,7 +12,7 @@ export const createEndereco = async (data: Prisma.EnderecoCreateInput) => {
     }
 }
 
-export const getEnderecoById = async (userId: number, id: number) => {
+export const getEnderecoById = async (id: number, userId: number) => {
     try {
         const endereco = await prisma.endereco.findFirst({
             where: {
@@ -58,11 +58,12 @@ export const getAllEnderecos = async (page: number = 1, limit: number = 20) => {
     }
 }
 
-export const updateEndereco = async (id: number, data: Prisma.EnderecoUpdateInput) => {
+export const updateEndereco = async (id: number, userId: number, data: Prisma.EnderecoUpdateInput) => {
     try {
         return await prisma.endereco.update({
             where: {
-                id
+                id,
+                userId
             },
             data,
             select: {
@@ -78,11 +79,12 @@ export const updateEndereco = async (id: number, data: Prisma.EnderecoUpdateInpu
     }
 }
 
-export const deleteEndereco = async (id: number) => {
+export const deleteEndereco = async (id: number, userId: number) => {
     try {
         return await prisma.endereco.delete({
             where: {
-                id
+                id,
+                userId
             },
             select: {
                 id: true

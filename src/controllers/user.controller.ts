@@ -4,9 +4,12 @@ import Logger from "../config/logger";
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const user = await userService.createUser(req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'usuario criado com sucesso!', user });
-    } catch (error) {
+        await userService.createUser(req.body);
+        return res.status(201).json({ 'status': 'success', 'message': 'usuario criado com sucesso!' });
+    } catch (error: any) {
+        if (error.message == "E-mail ou documento já cadastrado na plataforma.") {
+            return res.status(400).json({ error: error.message });
+        }
         Logger.error("Erro ao criar usuário", error);
         return res.status(500).json({ error: "Erro ao criar usuário" });
     }
@@ -17,7 +20,10 @@ export const getUserById = async (req: Request, res: Response) => {
         const { id } = req.params;
         const user = await userService.getUserById(Number(id));
         return res.status(200).json({ user });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message == "Usuário não encontrado.") {
+            return res.status(404).json({ error: error.message });
+        }
         Logger.error("Erro ao buscar usuário", error);
         return res.status(500).json({ error: "Erro ao buscar usuário" });
     }
@@ -27,7 +33,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const users = await userService.getAllUsers();
         return res.status(200).json({ users });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message == "Nenhum usuário encontrado.") {
+            return res.status(404).json({ error: error.message });
+        }
         Logger.error("Erro ao buscar usuários", error);
         return res.status(500).json({ error: "Erro ao buscar usuários" });
     }
