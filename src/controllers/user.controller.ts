@@ -56,7 +56,10 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const user = await userService.deleteUser(Number(id));
+        // Extrai o token do cabeçalho Authorization (formato "Bearer TOKEN")
+        const token = req.headers.authorization?.split(' ')[1];
+        const user = await userService.deleteUser(Number(id), token);
+
         return res.status(200).json({ 'status': 'success', 'message': 'usuario deletado com sucesso!', user });
     } catch (error: any) {
         Logger.error("Erro ao deletar usuário", error);

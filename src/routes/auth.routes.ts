@@ -26,8 +26,10 @@ const router = Router();
  *     responses:
  *       200:
  *         description: Sucesso ao retornar o token.
- *       500:
+ *       404:
  *         description: Senha ou email inválidos!
+ *       500:
+ *         description: Erro ao autenticar usuario 
  */
 router.post('/', authLimiter, login);
 

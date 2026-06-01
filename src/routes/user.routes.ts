@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createUser, getUserById, getAllUsers, updateUser, deleteUser } from "../controllers/user.controller";
 import { validateSchema } from "../middleware/validate.middlware";
-import { createUserSchema } from "../schemas/user.schema";
+import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { authLimiter } from '../middleware/rateLimiter.middleware';
 import { authenticate } from "../middleware/auth.middleware";
 
@@ -43,11 +43,16 @@ const router = Router();
  *       400:
  *         description: Entrada Inválida do usuario!
  *       500:
- *         description: Senha ou email inválidos!
+ *         description: erro ao criar usuário
  */
 router.post('/', authLimiter, validateSchema(createUserSchema), createUser);
 
+
+// ----------------------------- Rotas com Autenticação -------------------------------- \\
+
 router.use(authenticate);
+
+
 /**
  * @openapi
  * /user/{id}:
@@ -73,7 +78,10 @@ router.use(authenticate);
  *       404:
  *         description: Usuário não encontrado.
  */
+
 router.get('/:id', getUserById);
+
+
 /**
  * @openapi
  * /user:
@@ -91,9 +99,94 @@ router.get('/:id', getUserById);
  *       404:
  *         description: Nenhum usuario encontrado
  */
+
 router.get('/', getAllUsers);
 
-router.put('/:id', validateSchema(createUserSchema), updateUser);
+
+/**
+ * @openapi
+ * /user/{id}:
+ *   patch:
+ *     summary: Editar Usuario pelo ID
+ *     tags:
+ *       - User
+ *     requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *             schema:
+ *              type: object
+ *              properties:
+ *                  nome:
+ *                    type: string
+ *                    example: "gustavo"
+ *                  email:
+ *                    type: string
+ *                    example: "gustavo@gmail.com"
+ *                  senha:
+ *                    type: string
+ *                    example: 123456
+ *                  dataNascimento:
+ *                    type: string
+ *                    format: date
+ *                    example: "2007-02-01"
+ *                  documento:
+ *                     type: string
+ *                     example: "123.456.789-03"
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para buscar o usuario
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Alteração de dados 
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Usuário não encontrado.
+ *       500:
+ *         description: Erro ao editar usuario.
+ */
+
+router.patch('/:id', validateSchema(updateUserSchema), updateUser);
+
+
+/**
+ * @openapi
+ * /user/{id}:
+ *   delete:
+ *     summary: Apagar o Usuario pelo ID
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para apagar o usuario
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Usuario deletado do banco de dados
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Usuário não encontrado.
+ *       500:
+ *         description: Erro ao apagar Usuário
+ */
+
 router.delete('/:id', deleteUser);
+
+
 
 export default router;

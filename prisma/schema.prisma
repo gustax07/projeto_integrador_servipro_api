@@ -212,3 +212,10 @@ model CurriculoHabilidade {
   @@id([curriculoId, habilidadeId]) // Chave primária composta
   @@map("curriculo_habilidades")
 }
+
+model BlacklistedToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime // A data de expiração original do token, para limpeza futura
+  createdAt DateTime @default(now())
+}

@@ -1,52 +1,36 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import Logger from "../config/logger";
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { isTokenBlacklisted } from '../services/token.service';
 
-export interface AuthRequest extends Request {
-    userId?: number;
-}
+// Assumindo que JWT_SECRET está definido em suas variáveis de ambiente
+const JWT_SECRET = process.env.JWT_SECRET || 'segredo-provisorio';
 
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-        return res.status(401).json({ error: 'Token de autenticação não fornecido no cabeçalho.' });
-    }
-    const partesToken = authHeader.split(' ');
-    if (partesToken.length !== 2 || partesToken[0] !== 'Bearer') {
-        return res.status(401).json({ error: 'Formato de token malformado. Use: Bearer <token>' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Token de autenticação não fornecido.' });
     }
 
-    const token = partesToken[1];
-
-    if (!token) {
-        return res.status(401).json({ error: 'Token de autenticação ausente.' });
-    }
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-        Logger.error('ERRO CRÍTICO: JWT_SECRET não está definido nas variáveis de ambiente.');
-        return res.status(500).json({ error: 'Erro interno de configuração do servidor.' });
-    }
+    const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, jwtSecret) as { id: number };
+        // 1. Verifica a validade do token (assinatura e expiração)
+        jwt.verify(token, JWT_SECRET);
 
-        req.userId = decoded.id;
-        
-        return next(); 
-
+        // 2. Verifica se o token está na lista negra
+        const blacklisted = await isTokenBlacklisted(token);
+        if (blacklisted) {
+            return res.status(401).json({ message: 'Token inválido ou expirado.' });
+        }
+        next();
     } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
-            Logger.warn(`Sessão expirada para o token processado.`);
-            return res.status(401).json({ error: 'Sessão expirada. Faça login novamente.', code: 'TOKEN_EXPIRED' });
+            return res.status(401).json({ message: 'Token expirado.' });
         }
-        
         if (error.name === 'JsonWebTokenError') {
-            Logger.error(`Tentativa de uso de token inválido ou forjado.`);
-            return res.status(401).json({ error: 'Token de autenticação inválido.', code: 'INVALID_TOKEN' });
+            return res.status(401).json({ message: 'Token inválido.' });
         }
-        
-        Logger.error(`Falha inesperada na verificação do JWT: ${error.message}`);
-        return res.status(401).json({ error: 'Falha na autenticação.' });
+        return res.status(500).json({ message: 'Falha na autenticação do token.' });
     }
-}
+};

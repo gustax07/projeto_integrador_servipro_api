@@ -1,6 +1,8 @@
 import { prisma } from '../lib/prisma';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
+import { blacklistToken } from './token.service';
 
 export const createUser = async (data: Prisma.UserCreateInput) => {
     try {
@@ -72,11 +74,29 @@ export const getAllUsers = async (page: number = 1, limit: number = 20) => {
 
 export const updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
     try {
+        const dataToUpdate: Prisma.UserUpdateInput = { ...data };
+
+        // Verifica se a senha foi fornecida antes de fazer o hash
+        if (data.senha && typeof data.senha === 'string' && data.senha.trim() !== '') {
+            dataToUpdate.senha = await bcrypt.hash(data.senha, 10);
+        } else {
+            delete dataToUpdate.senha;
+        }
+
+        // Verifica se a data de nascimento foi fornecida e é válida antes de converter
+        if (data.dataNascimento) {
+            const date = new Date(String(data.dataNascimento));
+            if (isNaN(date.getTime())) {
+                throw new Error('Formato de data de nascimento inválido.');
+            }
+            dataToUpdate.dataNascimento = date;
+        } else {
+            delete dataToUpdate.dataNascimento;
+        }
+
         return await prisma.user.update({
-            where: {
-                id
-            },
-            data,
+            where: { id },
+            data: dataToUpdate,
             select: {
                 id: true
             },
@@ -85,15 +105,18 @@ export const updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
         if (error.code === 'P2025') {
             throw new Error('Usuário não encontrado para atualização.');
         }
+        if (error.message === 'Formato de data de nascimento inválido.') {
+            throw error; 
+        }
         console.error('Erro ao atualizar usuário:', error);
         throw error;
     }
 
 }
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (id: number, token?: string) => {
     try {
-        return await prisma.user.delete({
+        const deletedUser = await prisma.user.delete({
             where: {
                 id
             },
@@ -101,6 +124,15 @@ export const deleteUser = async (id: number) => {
                 id: true
             }
         });
+        if (token) {
+            const decodedToken: any = jwt.decode(token);
+            if (decodedToken && decodedToken.exp) {
+                const expiresAt = new Date(decodedToken.exp * 1000);
+                await blacklistToken(token, expiresAt);
+                console.log('Token blacklisted:', token);
+            }
+        }
+        return deletedUser;
     } catch (error: any) {
         if (error.code === 'P2025') {
             console.warn('Tentativa de deletar um usuário que não existe:', id);

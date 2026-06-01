@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response) => {
     } catch (error: any) {
         
         if (error.message == "Credenciais invalidas") {
-            return res.status(500).json({ error: "Senha ou email inválidos!" });
+            return res.status(404).json({ error: "Senha ou email inválidos!" });
         }
         Logger.error("Erro ao autenticar usuário", error);
         return res.status(500).json({ error: "Erro ao autenticar usuário" });
