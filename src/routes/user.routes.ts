@@ -52,6 +52,7 @@ router.post('/', authLimiter, validateSchema(createUserSchema), createUser);
 
 router.use(authenticate);
 
+// ----------------------------- Listar Usuário por ID -------------------------------- \\
 
 /**
  * @openapi
@@ -81,6 +82,7 @@ router.use(authenticate);
 
 router.get('/:id', getUserById);
 
+// ----------------------------- Listar Todos os Usuários -------------------------------- \\
 
 /**
  * @openapi
@@ -102,6 +104,7 @@ router.get('/:id', getUserById);
 
 router.get('/', getAllUsers);
 
+// ----------------------------- Editar o Usuario pelo ID -------------------------------- \\
 
 /**
  * @openapi
@@ -156,6 +159,7 @@ router.get('/', getAllUsers);
 
 router.patch('/:id', validateSchema(updateUserSchema), updateUser);
 
+// ----------------------------- Apagar o Usuario pelo ID -------------------------------- \\
 
 /**
  * @openapi

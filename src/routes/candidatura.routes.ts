@@ -1,17 +1,21 @@
 import { Router } from "express";
+import { authenticate } from "../middleware/auth.middleware";
 import { createCandidatura} from '../controllers/candidatura.controller';
 import { validateSchema } from '../middleware/validate.middlware';
 import { createCandidaturaSchema } from '../schemas/candidatura.schema';
 
 const router = Router();
 
+router.use(authenticate);
 /**
  * @openapi
  * /candidatura:
  *   post:
- *     summary: Adicionar uma candidatura que o usuario se candidatou-se
+ *     summary: Adicionar uma candidatura que o usuario candidatou-se no serviço
  *     tags:
  *       - Candidatura
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *        required: true
  *        content:
