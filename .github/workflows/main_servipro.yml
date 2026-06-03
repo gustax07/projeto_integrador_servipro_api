@@ -24,6 +24,9 @@ jobs:
           node-version: '24.x'
 
       - name: npm install, build, and test
+        env:
+          DATABASE_URL: "postgresql://user123:senha1234@localhost:5432/banco?schema=public"
+          JWT_SECRET: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTc3OTU2NDc2M30.10zd5e0DuYQpP1pEuAXtRJNoLduRDzm08ydVNKRGDDEvvQ2B8slMHeV-8KRrlnFIZeU8IIYK6zVujk1WLGZV1w
         run: |
           npm install
           npx prisma generate
