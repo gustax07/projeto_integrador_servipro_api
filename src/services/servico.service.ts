@@ -3,19 +3,21 @@ import { Prisma } from '@prisma/client'
 
 export const createServico = async (data: Prisma.ServicoCreateInput) => {
     try {
-        const servico = await prisma.servico.create({
+        return await prisma.servico.create({
             data,
             select: {
                 id: true
             }
         })
+    } catch (error: any) {
 
-        if (!servico) {
-            throw new Error('Já existe um serviço com este nome.')
+        if (error.code === 'P2002') {
+            throw new Error('Serviço já cadastrado no sistema.');
+        }
+        if (error.code === 'P2003') {
+            throw new Error('Setor ou usuário não encontrado.');
         }
 
-        return servico;
-    } catch (error) {
         console.error('Erro ao criar serviço:', error)
         throw error
     }
@@ -59,7 +61,7 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
             }
         })
 
-        if (!servicos) {
+        if (servicos.length === 0) {
             throw new Error('Nenhum serviço encontrado.')
         }
 
@@ -82,11 +84,11 @@ export const updateServico = async (id: number, userId: number, data: Prisma.Ser
                 id: true
             },
         })
-            if (!servico){
-                throw new Error('Já existe um serviço com este nome.')
-            }
+        if (!servico) {
+            throw new Error('Já existe um serviço com este nome.')
+        }
 
-            return servico;
+        return servico;
     } catch (error: any) {
         if (error.code === 'P2025') {
             throw new Error('Serviço não encontrado para atualização.');

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
-import { createSetor, updateSetor, getAllSetores } from "../controllers/setor.controller";
+import { createSetor, updateSetor, getAllSetores, getSetorById, deleteSetor } from "../controllers/setor.controller";
 import { validateSchema } from "../middleware/validate.middlware";
 import { createSetorSchema, updateSetorSchema } from "../schemas/setor.schema";
 
@@ -101,5 +101,63 @@ router.patch('/:id', validateSchema(updateSetorSchema), updateSetor);
  *         description: Erro ao editar setor.
  */
 router.get('/', getAllSetores);
+
+/**
+ * @openapi
+ * /setor/{id}:
+ *   get:
+ *     summary: Mostrar o setor pelo o ID especificado na URL
+ *     tags:
+ *       - Setor
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para buscar o usuario
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Trazer todos os setores com limite de 20 colunas
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Nenhum setor encontrado
+ *       500:
+ *         description: Erro ao editar setor.
+ */
+router.get('/:id', getSetorById);
+
+/**
+ * @openapi
+ * /setor/{id}:
+ *   delete:
+ *     summary: Excluir o setor pelo o ID especificado na URL
+ *     tags:
+ *       - Setor
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para buscar o usuario
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Excluir o Setor
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Nenhum setor encontrado
+ *       500:
+ *         description: Erro ao editar setor.
+ */
+router.delete('/:id', deleteSetor);
 
 export default router;

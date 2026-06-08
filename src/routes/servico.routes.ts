@@ -128,12 +128,6 @@ router.patch('/:id', validateSchema(updateServicoSchema), updateServico);
  *     summary: Mostrar todos os serviços
  *     tags:
  *       - Serviços
- *     requestBody:
- *        required: true
- *        content:
- *          application/json:
- *             schema:
- *              type: object
  *     security:
  *       - bearerAuth: []
  *     responses:

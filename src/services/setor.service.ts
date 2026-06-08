@@ -3,19 +3,16 @@ import { Prisma } from '@prisma/client'
 
 export const createSetor = async (data: Prisma.SetorCreateInput) => {
     try {
-        const setor = await prisma.setor.create({
+        return await prisma.setor.create({
             data,
             select: {
                 id: true
             }
         })
-
-        if (!setor) {
-            throw new Error('Já existe um setor com este nome.')
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            throw new Error('Já existe um setor com este nome.');
         }
-
-        return setor;
-    } catch (error) {
         console.error('Erro ao criar setor:', error)
         throw error
     }
@@ -30,7 +27,7 @@ export const getSetorById = async (id: number) => {
         })
 
         if (!setor) {
-            throw new Error('Setor não encontrado.')
+            throw new Error('Setor nao encontrado.')
         }
 
         return setor;
@@ -48,11 +45,15 @@ export const getAllSetores = async (page: number = 1, limit: number = 20) => {
             take: limit,
             orderBy: {
                 id: 'desc'
+            },
+            select: {
+                id: true,
+                nome: true
             }
         })
 
-        if (!setores) {
-            throw new Error('Nenhum setor encontrado.')
+       if (setores.length === 0) {
+            throw new Error('Nenhum setor encontrado')
         }
 
         return setores;
@@ -94,8 +95,7 @@ export const deleteSetor = async (id: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar um setor que não existe:', id);
-            return null;
+            throw new Error('Tentativa de deletar um setor que não existe',);
         }
 
         console.error('Erro ao deletar setor:', error)

@@ -1,36 +1,48 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { isTokenBlacklisted } from '../services/token.service';
 
-// Assumindo que JWT_SECRET está definido em suas variáveis de ambiente
-const JWT_SECRET = process.env.JWT_SECRET || 'segredo-provisorio';
+// 1. Estendemos a interface nativa do Request para o TypeScript aceitar nosso userId
+export interface AuthRequest extends Request {
+    userId?: number;
+}
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+// 2. Criamos o formato do Payload que guardamos dentro do token na hora do login
+interface TokenPayload {
+    id: number;
+    iat: number;
+    exp: number;
+}
+
+export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    // Busca o token no cabeçalho (Formato esperado: "Bearer eyJhbGciOiJIUzI1Ni...")
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Token de autenticação não fornecido.' });
+    if (!authHeader) {
+        res.status(401).json({ error: 'Token não fornecido.' });
+        return;
     }
 
-    const token = authHeader.split(' ')[1];
+    // Separa a palavra "Bearer" do token em si
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+        res.status(401).json({ error: 'Erro de formatação do Token.' });
+        return;
+    }
+
+    const token = parts[1];
 
     try {
-        // 1. Verifica a validade do token (assinatura e expiração)
-        jwt.verify(token, JWT_SECRET);
+        // Verifica a validade do token usando a sua chave secreta
+        const secret = process.env.JWT_SECRET || 'sua_senha_secreta_padrao';
+        const decoded = jwt.verify(token, secret) as TokenPayload;
 
-        // 2. Verifica se o token está na lista negra
-        const blacklisted = await isTokenBlacklisted(token);
-        if (blacklisted) {
-            return res.status(401).json({ message: 'Token inválido ou expirado.' });
-        }
-        next();
-    } catch (error: any) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ message: 'Token expirado.' });
-        }
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ message: 'Token inválido.' });
-        }
-        return res.status(500).json({ message: 'Falha na autenticação do token.' });
+        // Injeta o ID do usuário de volta na requisição!
+        req.userId = decoded.id;
+
+        // Libera a requisição para seguir para o Controller
+        return next();
+    } catch (error) {
+        res.status(401).json({ error: 'Token inválido ou expirado.' });
+        return;
     }
 };
