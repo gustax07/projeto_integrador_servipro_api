@@ -14,4 +14,11 @@ router.use('/candidatura', candidaturaRouter);
 router.use('/servico', servicoRouter);
 router.use('/setor', setorRouter);
 
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'API Ok', 
+    timestamp: new Date().toISOString() 
+  });
+});
+
 export default router;
