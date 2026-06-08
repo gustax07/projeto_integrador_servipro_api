@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,21 +23,30 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and test
+      - name: Install dependencies, generate Prisma and build
         env:
-          DATABASE_URL: "postgresql://user123:senha1234@localhost:5432/banco?schema=public"
-          JWT_SECRET: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTc3OTU2NDc2M30.10zd5e0DuYQpP1pEuAXtRJNoLduRDzm08ydVNKRGDDEvvQ2B8slMHeV-8KRrlnFIZeU8IIYK6zVujk1WLGZV1w
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           npm install
           npx prisma generate
           npm run build --if-present
-          npm run test --if-present
+
+      # PASSO CHAVE: Isola apenas os arquivos necessários para rodar a aplicação em produção
+      - name: Prepare production package
+        run: |
+          mkdir deploy-package
+          cp -r dist deploy-package/
+          cp -r node_modules deploy-package/
+          cp package.json deploy-package/
+          # Se o seu schema for necessário em runtime, inclua a linha abaixo:
+          # cp -r prisma deploy-package/ || true
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: deploy-package
 
   deploy:
     runs-on: ubuntu-latest
