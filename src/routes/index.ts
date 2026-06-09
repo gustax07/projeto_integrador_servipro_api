@@ -4,7 +4,7 @@ import loginRouter from './auth.routes';
 import candidaturaRouter from './candidatura.routes';
 import servicoRouter from './servico.routes';
 import setorRouter from './setor.routes';
-
+import enderecoRouter from './endereco.routes';
 
 const router = Router();
 
@@ -13,6 +13,7 @@ router.use('/login', loginRouter);
 router.use('/candidatura', candidaturaRouter);
 router.use('/servico', servicoRouter);
 router.use('/setor', setorRouter);
+router.use('/endereco', enderecoRouter);
 
 router.get('/api/health', (req, res) => {
   res.status(200).json({ 

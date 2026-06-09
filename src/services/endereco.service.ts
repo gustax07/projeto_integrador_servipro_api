@@ -4,7 +4,10 @@ import { prisma } from "../lib/prisma";
 export const createEndereco = async (data: Prisma.EnderecoCreateInput) => {
     try {
         return await prisma.endereco.create({
-            data
+            data,
+            select: {
+                id: true
+            }
         })
     } catch (error) {
         console.error('Erro ao criar endereço:', error);
@@ -72,7 +75,7 @@ export const updateEndereco = async (id: number, userId: number, data: Prisma.En
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Endereço não encontrado para atualização.');
+            throw new Error('Endereço ou usuário não encontrado.');
         }
         console.error('Erro ao atualizar endereço:', error);
         throw error;

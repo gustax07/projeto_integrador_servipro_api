@@ -11,7 +11,7 @@ router.use(authenticate);
  * @openapi
  * /servico:
  *   post:
- *     summary: Criar/Postar  serviço para candidato registrar-se
+ *     summary: Criar/Postar serviço para candidato registrar-se
  *     tags:
  *       - Serviços
  *     security:
@@ -49,7 +49,7 @@ router.use(authenticate);
  *                      example: 1
  *     responses:
  *       200:
- *         description: Conta criada com sucesso!
+ *         description: Serviço criada com sucesso!
  *       400:
  *         description: Entrada Inválida do usuario!
  *       500:
@@ -142,7 +142,64 @@ router.patch('/:id', validateSchema(updateServicoSchema), updateServico);
  */
 router.get('/', getAllServicos);
 
+
+/**
+ * @openapi
+ * /servico/{id}:
+ *   get:
+ *     summary: Exibir o Serviço pelo ID
+ *     tags:
+ *       - Serviços
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para editar um serviço
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Mostrar o Serviço
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Serviço não encontrado.
+ *       500:
+ *         description: Erro ao editar serviço.
+ */
 router.get('/:id', getServicoById);
+
+
+/**
+ * @openapi
+ * /servico/{id}:
+ *   delete:
+ *     summary: Apagar o Serviço pelo ID
+ *     tags:
+ *       - Serviços
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para editar um serviço
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: O Serviço foi deletado com sucesso
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Serviço não encontrado.
+ *       500:
+ *         description: Erro ao editar serviço.
+ */
 router.delete('/:id', deleteServico);
 
 export default router

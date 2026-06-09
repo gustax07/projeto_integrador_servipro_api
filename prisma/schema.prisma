@@ -41,9 +41,13 @@ model Endereco {
   bairro     String
   cidade     String
   estado     String  @db.Char(2) // Ex: SP, RJ
+  cep        String
+  principal  Boolean @default(false)
+  complemento String? @db.Text
   latitude   Float?  
   longitude  Float?  
   
+  // Chaves Estrangeiras
   userId     Int     @map("user_id")
   user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 

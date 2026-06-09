@@ -4,7 +4,9 @@ import { Prisma } from '@prisma/client'
 export const createServico = async (data: Prisma.ServicoCreateInput) => {
     try {
         return await prisma.servico.create({
-            data,
+            data:{
+                ...data,
+            },
             select: {
                 id: true
             }
@@ -56,7 +58,6 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
                 id: 'desc'
             },
             omit: {
-                userId: true,
                 setorId: true
             }
         })
@@ -111,8 +112,7 @@ export const deleteServico = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar um serviço que não existe:', id);
-            return null;
+            throw new Error('Serviço não encontrado para exclusão.');
         }
 
         console.error('Erro ao deletar serviço:', error)

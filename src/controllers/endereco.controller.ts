@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
 import * as enderecoService from '../services/endereco.service';
 import Logger from "../config/logger";
-import { number } from "zod";
+import { AuthRequest } from "../middleware/auth.middleware";
 
 export const createEndereco = async (req: Request, res: Response) => {
     try {
@@ -34,13 +34,19 @@ export const getAllEnderecos = async (req: Request, res: Response) => {
     }
 }
 
-export const updateEndereco = async (req: Request, res: Response) => {
+export const updateEndereco = async (req: AuthRequest, res: Response) => {
     try {
-        const { id, userId } = req.params;
-        await enderecoService.updateEndereco(Number(id), Number(userId), req.body);
+        if (!req.userId) {
+            return res.status(401).json({ error: "Usuário não autenticado" });
+        }
+        const { id } = req.params;
+        await enderecoService.updateEndereco(Number(id), Number(req.userId), req.body);
         return res.status(200).json({ 'status': 'success', 'message': 'endereco atualizado com sucesso!' });
-    } catch (error) {
+    } catch (error: any) {
         Logger.error("Erro ao atualizar endereco", error);
+        if (error.message === 'Endereço ou usuário não encontrado.') {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao atualizar endereco" });
     }
 }
