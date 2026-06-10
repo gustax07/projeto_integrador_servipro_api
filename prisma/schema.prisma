@@ -185,8 +185,9 @@ model Experiencia {
 
 model Curso {
   id          Int       @id @default(autoincrement())
-  tipo        Int       
+  tipo        String       
   nomeCurso   String    @map("nome_curso")
+  instituicao String    @map("instituicao")
   dataInicio  DateTime  @map("data_inicio") @db.Date
   dataFim     DateTime? @map("data_fim") @db.Date
   status      String

@@ -40,10 +40,13 @@ export const getEnderecoById = async (id: number, userId: number) => {
     }
 }
 
-export const getAllEnderecos = async (page: number = 1, limit: number = 20) => {
+export const getAllEnderecos = async (page: number = 1, limit: number = 20, userId: number) => {
     try {
         const skip = (page - 1) * limit;
-        return await prisma.endereco.findMany({
+        const endereco = await prisma.endereco.findMany({
+            where: {
+                userId
+            },
             skip,
             take: limit,
             orderBy: {
@@ -53,8 +56,22 @@ export const getAllEnderecos = async (page: number = 1, limit: number = 20) => {
                 userId: true,
                 latitude: true,
                 longitude: true,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        nome: true
+                    }
+                }
             }
         })
+
+        if (endereco.length === 0) {
+            throw new Error('Nenhum endereço encontrado para este usuário.');
+        }
+
+        return endereco;
     } catch (error) {
         console.error('Erro ao buscar todos endereços:', error);
         throw error;
@@ -95,8 +112,7 @@ export const deleteEndereco = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar um endereço que não existe:', id);
-            return null;
+            throw new Error('Endereço ou usuário não encontrado.');
         }
 
         console.error('Erro ao deletar endereço:', error);

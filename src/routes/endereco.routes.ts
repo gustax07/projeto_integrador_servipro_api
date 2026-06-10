@@ -60,6 +60,7 @@ router.use(authenticate);
  *         description: erro ao adicionar o endereço
  */
 router.post('/', validateSchema(createEnderecoSchema), createEndereco);
+
 /**
  * @openapi
  * /endereco/{id}:
@@ -123,8 +124,81 @@ router.post('/', validateSchema(createEnderecoSchema), createEndereco);
  */
 router.patch('/:id',validateSchema(updateEnderecoSchema), updateEndereco);
 
+/**
+ * @openapi
+ * /endereco:
+ *   get:
+ *     summary: Listar todos endereços de um usuário
+ *     tags:
+ *       - Endereço
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Mostrar todos os endereços de um usuário com limite de 20 colunas
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       500:
+ *         description: erro ao editar o endereço
+ */
 router.get('/', getAllEnderecos);
+
+/**
+ * @openapi
+ * /endereco/{id}:
+ *   get:
+ *     summary: Exibir endereço pelo ID
+ *     tags:
+ *       - Endereço
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para exibir um endereço
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Exibir endereço pelo ID
+ *       400:
+ *         description: Endereço não encontrado ou não pertence a este usuário.
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       500:
+ *         description: erro ao editar o endereço
+ */
 router.get('/:id', getEnderecoById);
+
+/**
+ * @openapi
+ * /endereco/{id}:
+ *   delete:
+ *     summary: Deletar um endereço pelo ID
+ *     tags:
+ *       - Endereço
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID Numerico para deletar um endereço
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Deletar endereço pelo ID
+ *       400:
+ *         description: Entrada Inválida do usuario!
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       500:
+ *         description: erro ao editar o endereço
+ */
 router.delete('/:id', deleteEndereco);
 
 export default router;

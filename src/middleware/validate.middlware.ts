@@ -13,7 +13,6 @@ export const validateSchema = (schema: ZodSchema) => {
             Logger.warn(`Tentativa de requisição inválida em ${req.url}`);
             
             return res.status(400).json({ 
-                success: false, 
                 erros: errosFormatados 
             });
         }

@@ -1,16 +1,31 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
-import { tr } from "zod/locales";
 
-export const createCurriculo = async (data: Prisma.CurriculoCreateInput) => {
+export const createCurriculo = async (data: any) => {
     try {
+        const { experiencias, cursos, habilidades, ...curriculoData } = data;
+
         return await prisma.curriculo.create({
-            data,
+            data: {
+                ...curriculoData,
+                experiencias: experiencias ? {
+                    create: experiencias,
+                } : undefined,
+                cursos: cursos ? {
+                    create: cursos,
+                } : undefined,
+                habilidades: habilidades ? {
+                    create: habilidades,
+                } : undefined,
+            },
             select: {
                 id: true
-            }
+            },
         })
-    } catch (error) {
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            throw new Error('O usuário já possui um currículo cadastrado.');
+        }
         console.error('Erro ao criar curriculo:', error)
         throw error
     }
