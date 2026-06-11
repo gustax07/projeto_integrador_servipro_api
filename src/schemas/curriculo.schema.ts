@@ -7,7 +7,6 @@ export const curriculoCreateSchema = z.object({
         dataInicio: z.coerce.date(),
         dataFim: z.coerce.date().nullable(),
         status: z.enum(['ATIVO', 'INATIVO']),
-        curriculoId: z.number().optional()
     })).nullable(),
     cursos: z.array(z.object({
         nomeCurso: z.string(),
@@ -16,7 +15,6 @@ export const curriculoCreateSchema = z.object({
         dataInicio: z.coerce.date(),
         dataFim: z.coerce.date().nullable(),
         status: z.enum(['EM_ANDAMENTO', 'CONCLUIDO', 'INTERROMPIDO']),
-        curriculoId: z.number().optional()
     })).nullable(),
     habilidades: z.array(z.object({
         nome: z.string(),
