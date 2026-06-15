@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 
 export const createCurriculo = async (data: any) => {
@@ -125,10 +124,18 @@ export const getAllCurriculos = async (page: number = 1, limit: number = 20) => 
     }
 }
 
-export const updateCurriculo = async (id: number, userId: number, data: any, 
-    idExperencia?: number, idCurso?: number) => {
+export const updateCurriculo = async (
+    id: number, 
+    userId: number, 
+    data: any, 
+    idExperencia?: number, 
+    idCurso?: number
+) => {
     try {
         const { experiencias, cursos, habilidades, ...curriculoData } = data;
+        const expData = Array.isArray(experiencias) ? experiencias[0] : experiencias;
+        const cursoData = Array.isArray(cursos) ? cursos[0] : cursos;
+
         return await prisma.curriculo.update({
             where: {
                 id,
@@ -136,48 +143,53 @@ export const updateCurriculo = async (id: number, userId: number, data: any,
             },
             data: {
                 ...curriculoData,
-                experiencias: experiencias?.length ? {
+                experiencias: expData ? {
                     upsert: {
                         where: {
                             id: idExperencia ? idExperencia : -1
                         },
-                        create: experiencias,
-                        update: experiencias
+                        create: expData,
+                        update: expData
                     }
                 } : undefined,
-                cursos: cursos?.length ? {
+                cursos: cursoData ? {
                     upsert: {
                         where: {
                             id: idCurso ? idCurso : -1
                         },
-                        create: cursos,
-                        update: cursos
+                        create: cursoData,
+                        update: cursoData
                     }
                 } : undefined,
                 habilidades: habilidades?.length ? {
                     create: habilidades.map((h: { nome: string }) => ({
                         habilidade: {
-                            connectOrCreateOrUpdate: {
+                            connectOrCreate: {
                                 where: {
                                     nome: h.nome
                                 },
-                                create: { nome: h.nome },
-                                update: { nome: h.nome }
+                                create: { 
+                                    nome: h.nome 
+                                }
                             }
-                        },
-                    })),
+                        }
+                    }))
                 } : undefined,
             },
             select: {
                 id: true
             },
         })
-
+        
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Curriculo não encontrado para atualização.');
+            throw new Error('Currículo não encontrado para atualização.');
         }
-        console.error('Erro ao atualizar curriculo:', error)
+        if (error.code === 'P2002') {
+            console.warn('Tentativa de criar experiência ou curso duplicado para o currículo:', { id, data });
+            throw new Error('Experiência ou curso com os mesmos dados já existe para este currículo.');
+        }
+        console.error('Erro ao atualizar currículo:', error)
         throw error
     }
 }

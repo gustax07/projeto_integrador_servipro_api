@@ -18,7 +18,7 @@ export const curriculoCreateSchema = z.object({
     })).nullable(),
     habilidades: z.array(z.object({
         nome: z.string(),
-    })).nullable(),
+    })).optional(),
 });
 
 export const curriculoUpdateSchema = curriculoCreateSchema.partial();

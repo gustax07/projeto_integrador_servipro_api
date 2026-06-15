@@ -150,6 +150,20 @@ router.get('/', getAllCurriculos);
  *         schema:
  *            type: integer
  *            example: 1
+ *       - in: query
+ *         name: idExperencia
+ *         required: false
+ *         description: ID da experiencia a ser atualizado.
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *       - in: query
+ *         name: idCurso
+ *         required: false
+ *         description: ID do curso a ser atualizado.
+ *         schema:
+ *            type: integer
+ *            example: 1
  *     requestBody:
  *       required: true
  *       content:

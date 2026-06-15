@@ -9,7 +9,14 @@ export const createPerfil = async (data: Prisma.PerfilCreateInput) => {
                 id: true
             }
         })
-    } catch (error) {
+    } catch (error: any) {
+        console.error('Erro ao criar perfil:', error)
+        if (error.code === 'P2002') {
+            throw new Error('Perfil já cadastrado no sistema.');
+        }
+        if (error.code === 'P2003') {
+            throw new Error('Setor ou usuário não encontrado.');
+        }
         console.error('Erro ao criar perfil:', error)
         throw error
     }
@@ -42,7 +49,7 @@ export const getPerfilById = async (id: number, userId: number) => {
 export const getAllPerfis = async (page: number = 1, limit: number = 20) => {
     try {
         const skip = (page - 1) * limit;
-        const perfis = await prisma.perfil.findMany({
+        return await prisma.perfil.findMany({
             skip,
             take: limit,
             orderBy: {
@@ -53,13 +60,10 @@ export const getAllPerfis = async (page: number = 1, limit: number = 20) => {
                 setorId: true
             }
         })
-
-        if (!perfis) {
+    } catch (error: any) {
+        if (error.code === 'P2025') {
             throw new Error('Nenhum perfil encontrado.')
         }
-
-        return perfis
-    } catch (error) {
         console.error('Erro ao buscar todos perfis:', error)
         throw error
     }

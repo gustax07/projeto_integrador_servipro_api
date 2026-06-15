@@ -8,18 +8,20 @@ import enderecoRouter from './endereco.routes';
 import habilidadeRouter from './habilidade.routes';
 import cursoRouter from './curso.routes';
 import curriculoRouter from './curriculo.routes';
+import perfilRouter from './perfil.routes';
 
 const router = Router();
 
-router.use('/user', userRouter);
-router.use('/login', loginRouter);
 router.use('/candidatura', candidaturaRouter);
-router.use('/servico', servicoRouter);
-router.use('/setor', setorRouter);
+router.use('/curriculo', curriculoRouter);
+router.use('/curso', cursoRouter);
 router.use('/endereco', enderecoRouter);
 router.use('/habilidade', habilidadeRouter);
-router.use('/curso', cursoRouter);
-router.use('/curriculo', curriculoRouter);
+router.use('/login', loginRouter);
+router.use('/perfil', perfilRouter);
+router.use('/servico', servicoRouter);
+router.use('/setor', setorRouter);
+router.use('/user', userRouter);
 
 router.get('/api/health', (req, res) => {
   res.status(200).json({ 

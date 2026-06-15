@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -12,90 +12,108 @@ datasource db {
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
-  nome             String
-  email            String    @unique
-  senha            String
-  dataNascimento   DateTime  @map("data_nascimento") @db.Date
-  documento        String    @unique // CPF/CNPJ
+  id             Int      @id @default(autoincrement())
+  nome           String
+  email          String   @unique
+  senha          String
+  dataNascimento DateTime @map("data_nascimento") @db.Date
+  documento      String   @unique // CPF/CNPJ
 
   // Relacionamentos
-  perfil             Perfil?
-  curriculo          Curriculo?
-  enderecos          Endereco[]
-  telefones          Telefone[]
-  servicosPostados   Servico[]
-  candidaturas       Candidatura[]
-  
+  perfil           Perfil?
+  curriculo        Curriculo?
+  enderecos        Endereco[]
+  telefones        Telefone[]
+  servicosPostados Servico[]
+  candidaturas     Candidatura[]
+
   // Relacionamento do Chat
-  mensagensEnviadas  Mensagem[] @relation("MensagensEnviadas")
-  mensagensRecebidas Mensagem[] @relation("MensagensRecebidas")
+  mensagensEnviadas   Mensagem[]  @relation("MensagensEnviadas")
+  mensagensRecebidas  Mensagem[]  @relation("MensagensRecebidas")
+  avaliacoesRecebidas Avaliacao[] @relation("AvaliacoesRecebidas")
+  avaliacoesEnviadas  Avaliacao[] @relation("AvaliacoesEnviadas")
 
   @@map("users")
 }
 
 model Endereco {
-  id         Int     @id @default(autoincrement())
-  logradouro String
-  numero     Int
-  bairro     String
-  cidade     String
-  estado     String  @db.Char(2) // Ex: SP, RJ
-  cep        String
-  principal  Boolean @default(false)
+  id          Int     @id @default(autoincrement())
+  logradouro  String
+  numero      Int
+  bairro      String
+  cidade      String
+  estado      String  @db.Char(2) // Ex: SP, RJ
+  cep         String
+  principal   Boolean @default(false)
   complemento String? @db.Text
-  latitude   Float?  
-  longitude  Float?  
-  
+  latitude    Float?
+  longitude   Float?
+
   // Chaves Estrangeiras
-  userId     Int     @map("user_id")
-  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("enderecos")
 }
 
 model Telefone {
-  id      Int    @id @default(autoincrement())
-  ddd     Int
-  numero  Int    @unique
-  
-  userId  Int    @map("user_id")
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int @id @default(autoincrement())
+  ddd    Int
+  numero Int @unique
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("telefones")
 }
 
 model Perfil {
-  id              Int       @id @default(autoincrement())
-  descricao       String?   @db.Text
-  dataPostagem    DateTime  @default(now()) @map("data_postagem")
-  status          String    @default("ativo")
-  
-  avaliacoes      Decimal   @default(0.00) @db.Decimal(3, 2)
-  verificado      Boolean   @default(false)
-  nomeSocial      String?   @map("nome_social")
-  viajar          Boolean   @default(false)
-  disponibilidade String?
-  tipoServico     String?   @map("tipo_servico")
-  
+  id          Int      @id @default(autoincrement())
+  descricao   String?  @db.Text
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+  status      String   @default("ativo")
+
+  avaliacoes      Decimal @default(0.00) @db.Decimal(3, 2)
+  verificado      Boolean @default(false)
+  exibirPerfil    Boolean @default(false) @map("exibir_perfil")
+  nomeSocial      String? @map("nome_social")
+  viajar          Boolean @default(false)
+  disponibilidade String? @default("não definida")
+  tipoServico     String? @default("não definida") @map("tipo_servico")
+
   // Flags de Controle
-  isPrestador     Boolean   @default(false) @map("is_prestador")
-  isContratante   Boolean   @default(false) @map("is_contratante")
+  isPrestador   Boolean @default(false) @map("is_prestador")
+  isContratante Boolean @default(false) @map("is_contratante")
 
   // Chaves Estrangeiras
-  userId          Int       @unique @map("user_id")
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  setorId         Int?      @map("setor_id")
-  setor           Setor?    @relation(fields: [setorId], references: [id])
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  setorId Int?   @map("setor_id")
+  setor   Setor? @relation(fields: [setorId], references: [id])
 
   @@index([isPrestador, status])
   @@map("perfis")
 }
 
+model Avaliacao {
+  id         Int     @id @default(autoincrement())
+  nota       Decimal @default(0.00) @db.Decimal(3, 2)
+  comentario String? @db.Text
+
+  // Relacionamento com User
+  avaliacaoReceberId Int  @map("avaliacao_receber_id")
+  recebedor          User @relation("AvaliacoesRecebidas", fields: [avaliacaoReceberId], references: [id], onDelete: Cascade)
+
+  avaliacaoEnviarId Int  @map("avaliacao_enviar_id")
+  autor             User @relation("AvaliacoesEnviadas", fields: [avaliacaoEnviarId], references: [id], onDelete: Cascade)
+
+  @@map("avaliacoes")
+}
+
 model Setor {
-  id       Int       @id @default(autoincrement())
-  nome     String    @unique
+  id   Int    @id @default(autoincrement())
+  nome String @unique
 
   servicos Servico[]
   perfis   Perfil[]
@@ -104,21 +122,21 @@ model Setor {
 }
 
 model Servico {
-  id           Int           @id @default(autoincrement())
-  titulo       String        @unique
-  dataPostagem DateTime      @default(now()) @map("data_postagem")
-  formato      String        // Ex: "Presencial", "Remoto"
-  descricao    String        @db.Text
-  requisitos   String?       @db.Text
-  salario      Decimal?      @db.Decimal(10, 2) // Alterado para Decimal
-  tipoSalario  String        @map("tipo_salario") // Ex: "Por hora", "Fixo"
-  
+  id           Int      @id @default(autoincrement())
+  titulo       String   @unique
+  dataPostagem DateTime @default(now()) @map("data_postagem")
+  formato      String // Ex: "Presencial", "Remoto"
+  descricao    String   @db.Text
+  requisitos   String?  @db.Text
+  salario      Decimal? @db.Decimal(10, 2) // Alterado para Decimal
+  tipoSalario  String   @map("tipo_salario") // Ex: "Por hora", "Fixo"
+
   // Chaves Estrangeiras
-  userId       Int           @map("user_id")
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  setorId      Int           @map("setor_id")
-  setor        Setor         @relation(fields: [setorId], references: [id])
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  setorId Int   @map("setor_id")
+  setor   Setor @relation(fields: [setorId], references: [id])
 
   candidaturas Candidatura[]
 
@@ -126,30 +144,30 @@ model Servico {
 }
 
 model Candidatura {
-  id         Int      @id @default(autoincrement())
-  status     String   @default("pendente") // Ex: pendente, aceita, recusada
-  
-  servicoId  Int      @map("servico_id")
-  servico    Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
-  
-  userId     Int      @map("user_id")
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int    @id @default(autoincrement())
+  status String @default("pendente") // Ex: pendente, aceita, recusada
+
+  servicoId Int     @map("servico_id")
+  servico   Servico @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([servicoId, userId])
   @@map("candidaturas")
 }
 
 model Mensagem {
-  id             Int      @id @default(autoincrement())
-  conteudo       String   @db.Text
-  lida           Boolean  @default(false)
-  criadoEm       DateTime @default(now()) @map("criado_em")
-  
-  remetenteId    Int      @map("remetente_id")
-  destinatarioId Int      @map("destinatario_id")
-  
-  remetente      User     @relation("MensagensEnviadas", fields: [remetenteId], references: [id], onDelete: Cascade)
-  destinatario   User     @relation("MensagensRecebidas", fields: [destinatarioId], references: [id], onDelete: Cascade)
+  id       Int      @id @default(autoincrement())
+  conteudo String   @db.Text
+  lida     Boolean  @default(false)
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  remetenteId    Int @map("remetente_id")
+  destinatarioId Int @map("destinatario_id")
+
+  remetente    User @relation("MensagensEnviadas", fields: [remetenteId], references: [id], onDelete: Cascade)
+  destinatario User @relation("MensagensRecebidas", fields: [destinatarioId], references: [id], onDelete: Cascade)
 
   @@index([remetenteId, destinatarioId])
   @@index([criadoEm])
@@ -157,11 +175,11 @@ model Mensagem {
 }
 
 model Curriculo {
-  id           Int                   @id @default(autoincrement())
-  objetivo     String?               @db.Text
-  
-  userId       Int                   @unique @map("user_id")
-  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       Int     @id @default(autoincrement())
+  objetivo String? @db.Text
+
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   experiencias Experiencia[]
   cursos       Curso[]
@@ -175,8 +193,8 @@ model Experiencia {
   nomeEmpresa String    @map("nome_empresa")
   dataInicio  DateTime  @map("data_inicio") @db.Date
   dataFim     DateTime? @map("data_fim") @db.Date // Nullable caso seja o emprego atual
-  status      String    // Ex: "Concluído", "Atual"
-  
+  status      String // Ex: "Concluído", "Atual"
+
   curriculoId Int       @map("curriculo_id")
   curriculo   Curriculo @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
 
@@ -185,13 +203,13 @@ model Experiencia {
 
 model Curso {
   id          Int       @id @default(autoincrement())
-  tipo        String       
+  tipo        String
   nomeCurso   String    @map("nome_curso")
   instituicao String    @map("instituicao")
   dataInicio  DateTime  @map("data_inicio") @db.Date
   dataFim     DateTime? @map("data_fim") @db.Date
   status      String
-  
+
   curriculoId Int       @map("curriculo_id")
   curriculo   Curriculo @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
 
@@ -199,21 +217,21 @@ model Curso {
 }
 
 model Habilidade {
-  id          Int                   @id @default(autoincrement())
-  nome        String                @unique
-  
-  curriculos  CurriculoHabilidade[]
+  id   Int    @id @default(autoincrement())
+  nome String @unique
+
+  curriculos CurriculoHabilidade[]
 
   @@map("habilidades")
 }
 
 // Tabela Pivô (N:N) - Currículo <-> Habilidade
 model CurriculoHabilidade {
-  curriculoId   Int        @map("curriculo_id")
-  habilidadeId  Int        @map("habilidade_id")
-  
-  curriculo     Curriculo  @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
-  habilidade    Habilidade @relation(fields: [habilidadeId], references: [id], onDelete: Cascade)
+  curriculoId  Int @map("curriculo_id")
+  habilidadeId Int @map("habilidade_id")
+
+  curriculo  Curriculo  @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
+  habilidade Habilidade @relation(fields: [habilidadeId], references: [id], onDelete: Cascade)
 
   @@id([curriculoId, habilidadeId]) // Chave primária composta
   @@map("curriculo_habilidades")
