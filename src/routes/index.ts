@@ -9,6 +9,7 @@ import habilidadeRouter from './habilidade.routes';
 import cursoRouter from './curso.routes';
 import curriculoRouter from './curriculo.routes';
 import perfilRouter from './perfil.routes';
+import experienciaRouter from './experiencia.routes';
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use('/candidatura', candidaturaRouter);
 router.use('/curriculo', curriculoRouter);
 router.use('/curso', cursoRouter);
 router.use('/endereco', enderecoRouter);
+router.use('/experiencia', experienciaRouter);
 router.use('/habilidade', habilidadeRouter);
 router.use('/login', loginRouter);
 router.use('/perfil', perfilRouter);

@@ -4,26 +4,35 @@ import { prisma } from "../lib/prisma";
 export const createExperiencia = async (data: Prisma.ExperienciaCreateInput) => {
     try {
         return await prisma.experiencia.create({
-            data,
+            data: {
+                ...data,
+                dataInicio: new Date(data.dataInicio),
+                dataFim: data.dataFim ? new Date(data.dataFim) : null
+            },
             select: {
                 id: true
             }
         })
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao criar experiencia:', error)
+        if (error.code === 'P2003') {
+            throw new Error('Curriculo não encontrado.');
+        }
         throw error
     }
 }
 
-export const getExperienciaById = async (id: number, curriculoId: number) => {
+export const getExperienciaById = async (id: number) => {
     try {
         const experiencia = await prisma.experiencia.findFirst({
             where: {
                 id,
-                curriculoId
             },
             omit: {
                 curriculoId: true,
+            },
+            include: {
+                curriculo: true
             }
         })
 
@@ -70,7 +79,11 @@ export const updateExperiencia = async (id: number, curriculoId: number, data: P
                 id,
                 curriculoId
             },
-            data,
+            data: {
+                ...data,
+                dataInicio: new Date(String(data.dataInicio)),
+                dataFim: data.dataFim ? new Date(String(data.dataFim)) : null
+            },
             select: {
                 id: true
             },

@@ -128,6 +128,8 @@ router.get('/:id', getCurriculoById);
  *         description: Currículo criado com sucesso.
  *       400:
  *         description: Entrada inválida do usuário.
+ *       404:
+ *          description: Nenhum Curriculo encontrado
  *       500:
  *         description: Erro ao criar currículo.
  */

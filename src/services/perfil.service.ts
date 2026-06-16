@@ -32,13 +32,14 @@ export const getPerfilById = async (id: number, userId: number) => {
             omit: {
                 userId: true,
                 setorId: true
+            },
+            include: {
+                setor: true
             }
         })
-
         if (!perfil) {
             throw new Error('Perfil não encontrado ou não pertence a este usuário.')
         }
-
         return perfil
     } catch (error) {
         console.error('Erro ao buscar perfil por ID:', error)
@@ -49,7 +50,7 @@ export const getPerfilById = async (id: number, userId: number) => {
 export const getAllPerfis = async (page: number = 1, limit: number = 20) => {
     try {
         const skip = (page - 1) * limit;
-        return await prisma.perfil.findMany({
+        const perfil = await prisma.perfil.findMany({
             skip,
             take: limit,
             orderBy: {
@@ -58,8 +59,17 @@ export const getAllPerfis = async (page: number = 1, limit: number = 20) => {
             omit: {
                 userId: true,
                 setorId: true
+            },
+            include: {
+                setor: true
             }
         })
+
+        if (perfil.length === 0) {
+            throw new Error('Nenhum perfil encontrado.')
+        }
+
+        return perfil
     } catch (error: any) {
         if (error.code === 'P2025') {
             throw new Error('Nenhum perfil encontrado.')
@@ -102,9 +112,8 @@ export const deletePerfil = async (id: number, userId: number) => {
             }
         });
     } catch (error: any) {
-        if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar um perfil que não existe:', id);
-            return null;
+        if (error.code === 'P2025') { 
+            throw new Error('Perfil não encontrado para exclusão.');
         }
 
         console.error('Erro ao deletar perfil:', error)

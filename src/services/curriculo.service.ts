@@ -113,7 +113,7 @@ export const getAllCurriculos = async (page: number = 1, limit: number = 20) => 
             }
         })
 
-        if (!curriculos) {
+        if (curriculos.length === 0) {
             throw new Error('Nenhum curriculo encontrado.')
         }
 

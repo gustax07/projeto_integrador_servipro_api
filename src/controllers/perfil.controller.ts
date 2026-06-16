@@ -21,13 +21,20 @@ export const createPerfil = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export const getPerfilById = async (req: Request, res: Response) => {
+export const getPerfilById = async (req: AuthRequest, res: Response) => {
     try {
-        const { id, userId } = req.params;
-        const perfil = await perfilService.getPerfilById(Number(id), Number(userId));
-        return res.status(200).json({ perfil });
+        const { id } = req.params;
+        if (!req.userId) {
+            return res.status(401).json({ error: "Usuário não autenticado" });
+        }
+
+        const perfil = await perfilService.getPerfilById(Number(id), Number(req.userId));
+        return res.status(201).json({ perfil });
     } catch (error: any) {
         Logger.error("Erro ao buscar perfil", error);
+        if (error.message) {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(501).json({ error: "Erro ao buscar perfil" });
     }
 }
@@ -38,28 +45,43 @@ export const getAllPerfis = async (req: Request, res: Response) => {
         return res.status(200).json({ perfis });
     } catch (error: any) {
         Logger.error("Erro ao buscar perfis", error);
+        if (error.message) {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao buscar perfis" });
     }
 }
 
-export const updatePerfil = async (req: Request, res: Response) => {
+export const updatePerfil = async (req: AuthRequest, res: Response) => {
     try {
-        const { id, userId } = req.params;
-        await perfilService.updatePerfil(Number(id), Number(userId), req.body);
-        return res.status(200).json({ 'status': 'success', 'message': 'perfil atualizado com sucesso!' });
+        const { id } = req.params;
+        if (!req.userId) {
+            return res.status(401).json({ error: "Usuário não autenticado" });
+        }
+
+        await perfilService.updatePerfil(Number(id), Number(req.userId), req.body); return res.status(201).json({ 'status': 'success', 'message': 'perfil atualizado com sucesso!' });
     } catch (error: any) {
         Logger.error("Erro ao atualizar perfil", error);
+        if (error.message) {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao atualizar perfil" });
     }
 }
 
-export const deletePerfil = async (req: Request, res: Response) => {
+export const deletePerfil = async (req: AuthRequest, res: Response) => {
     try {
-        const { id, userId } = req.params;
-        await perfilService.deletePerfil(Number(id), Number(userId));
-        return res.status(200).json({ 'status': 'success', 'message': 'perfil deletado com sucesso!' });
+        const { id } = req.params;
+        if (!req.userId) {
+            res.status(401).json({ error: "Usuário não autenticado" });
+        }
+        await perfilService.deletePerfil(Number(id), Number(req.userId));
+        return res.status(201).json({ 'status': 'success', 'message': 'perfil deletado com sucesso!' });
     } catch (error: any) {
         Logger.error("Erro ao deletar perfil", error);
+        if (error.message){
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao deletar perfil" });
     }
 }
