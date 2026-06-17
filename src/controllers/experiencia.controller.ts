@@ -20,8 +20,11 @@ export const getExperienciaById = async (req: Request, res: Response) => {
         const { id } = req.params;
         const experiencia = await experienciaService.getExperienciaById(Number(id));
         return res.status(201).json({ experiencia });
-    } catch (error) {
+    } catch (error: any) {
         Logger.error("Erro ao buscar experiencia", error);
+        if (error.message) {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao buscar experiencia" });
     }
 }
@@ -38,7 +41,8 @@ export const getAllExperiencias = async (req: Request, res: Response) => {
 
 export const updateExperiencia = async (req: Request, res: Response) => {
     try {
-        const { id, curriculoId } = req.params;
+        const { id } = req.params;
+        const { curriculoId } = req.query;
         if (!curriculoId) {
             return res.status(404).json({ error: "Curriculo não encontrado." });
         }
@@ -52,11 +56,20 @@ export const updateExperiencia = async (req: Request, res: Response) => {
 
 export const deleteExperiencia = async (req: Request, res: Response) => {
     try {
-        const { id, curriculoId } = req.params;
+        const { id } = req.params;
+        const { curriculoId } = req.query;
+
+        if (!curriculoId) {
+            return res.status(404).json({ error: "Curriculo não encontrado." });
+        }
+
         await experienciaService.deleteExperiencia(Number(id), Number(curriculoId));
         return res.status(201).json({ 'status': 'success', 'message': 'experiencia deletada com sucesso!' });
-    } catch (error) {
+    } catch (error: any) {
         Logger.error("Erro ao deletar experiencia", error);
+        if (error.message) {
+            return res.status(404).json({ error: error.message });
+        }
         return res.status(500).json({ error: "Erro ao deletar experiencia" });
     }
 }

@@ -1,68 +1,33 @@
 import { Response, Request } from "express";
 import * as userService from '../services/user.service';
-import Logger from "../config/logger";
 
 export const createUser = async (req: Request, res: Response) => {
-    try {
-        await userService.createUser(req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'usuario criado com sucesso!' });
-    } catch (error: any) {
-        if (error.message == "E-mail ou documento já cadastrado na plataforma.") {
-            return res.status(400).json({ error: error.message });
-        }
-        Logger.error("Erro ao criar usuário", error);
-        return res.status(500).json({ error: "Erro ao criar usuário" });
-    }
+    await userService.createUser(req.body);
+    return res.status(201).json({ 'status': 'success', 'message': 'usuario criado com sucesso!' });
 }
 
 export const getUserById = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const user = await userService.getUserById(Number(id));
-        return res.status(200).json({ user });
-    } catch (error: any) {
-        if (error.message == "Usuário não encontrado.") {
-            return res.status(404).json({ error: error.message });
-        }
-        Logger.error("Erro ao buscar usuário", error);
-        return res.status(500).json({ error: "Erro ao buscar usuário" });
-    }
+    const { id } = req.params;
+    const user = await userService.getUserById(id ? Number(id) : Number(undefined));
+    return res.status(200).json({ user });
 }
 
 export const getAllUsers = async (req: Request, res: Response) => {
-    try {
-        const users = await userService.getAllUsers();
-        return res.status(200).json({ users });
-    } catch (error: any) {
-        if (error.message == "Nenhum usuário encontrado.") {
-            return res.status(404).json({ error: error.message });
-        }
-        Logger.error("Erro ao buscar usuários", error);
-        return res.status(500).json({ error: "Erro ao buscar usuários" });
-    }
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const users = await userService.getAllUsers(page, limit);
+    return res.status(200).json({ users });
 }
 
 export const updateUser = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const user = await userService.updateUser(Number(id), req.body);
-        return res.status(200).json({ 'status': 'success', 'message': 'usuario atualizado com sucesso!', user });
-    } catch (error) {
-        Logger.error("Erro ao atualizar usuário", error);
-        return res.status(500).json({ error: "Erro ao atualizar usuário" });
-    }
+    const { id } = req.params;
+    const user = await userService.updateUser(id ? Number(id) : Number(undefined), req.body);
+    return res.status(200).json({ 'status': 'success', 'message': 'usuario atualizado com sucesso!', user });
 }
 
 export const deleteUser = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        // Extrai o token do cabeçalho Authorization (formato "Bearer TOKEN")
-        const token = req.headers.authorization?.split(' ')[1];
-        const user = await userService.deleteUser(Number(id), token);
-
-        return res.status(200).json({ 'status': 'success', 'message': 'usuario deletado com sucesso!', user });
-    } catch (error: any) {
-        Logger.error("Erro ao deletar usuário", error);
-        return res.status(500).json({ error: "Erro ao deletar usuário" });
-    }
+    const { id } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
+    await userService.deleteUser(id ? Number(id) : Number(undefined), token);
+    return res.status(200).json({ 'status': 'success', 'message': 'usuario deletado com sucesso!' });
 }

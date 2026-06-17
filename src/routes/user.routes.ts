@@ -43,7 +43,7 @@ const router = Router();
  *       400:
  *         description: Entrada Inválida do usuario!
  *       500:
- *         description: erro ao criar usuário
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/', authLimiter, validateSchema(createUserSchema), createUser);
 
@@ -78,6 +78,8 @@ router.use(authenticate);
  *         description: Token de autenticação não fornecido no cabeçalho.
  *       404:
  *         description: Usuário não encontrado.
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 router.get('/:id', getUserById);
@@ -93,6 +95,19 @@ router.get('/:id', getUserById);
  *       - User
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         description: Numero da página.
+ *         required: false
+ *         schema:
+ *            type: integer
+ *       - in: query
+ *         name: limit
+ *         description: Limite de informações por página. 
+ *         required: false
+ *         schema:
+ *            type: integer    
  *     responses:
  *       200:
  *         description: Dados de todos os Usuarios com limite de 20 por página
@@ -100,6 +115,8 @@ router.get('/:id', getUserById);
  *         description: Token de autenticação não fornecido no cabeçalho.
  *       404:
  *         description: Nenhum usuario encontrado
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError' 
  */
 
 router.get('/', getAllUsers);
@@ -154,7 +171,7 @@ router.get('/', getAllUsers);
  *       404:
  *         description: Usuário não encontrado.
  *       500:
- *         description: Erro ao editar usuario.
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 router.patch('/:id', validateSchema(updateUserSchema), updateUser);
@@ -186,7 +203,7 @@ router.patch('/:id', validateSchema(updateUserSchema), updateUser);
  *       404:
  *         description: Usuário não encontrado.
  *       500:
- *         description: Erro ao apagar Usuário
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 router.delete('/:id', deleteUser);

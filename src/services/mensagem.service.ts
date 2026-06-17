@@ -1,10 +1,14 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
 
-export const createMensagem = async (data: Prisma.MensagemCreateInput) => {
+export const createMensagem = async (data: Prisma.MensagemUncheckedCreateInput, remetenteId: number) => {
     try {
         return await prisma.mensagem.create({
-            data,
+            data: {
+                ...data,
+                remetenteId
+            },
             select: {
                 id: true
             }
@@ -26,7 +30,7 @@ export const getMensagemById = async (id: number, remetenteId: number, destinata
         })
 
         if (!mensagem) {
-            throw new Error('Mensagem não encontrada ou não pertence a este usuário.')
+            throw new AppError('Mensagem não encontrada ou não pertence a este usuário.', 404)
         }
 
         return mensagem

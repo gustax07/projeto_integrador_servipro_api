@@ -110,8 +110,7 @@ export const deleteExperiencia = async (id: number, curriculoId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar uma experiencia que não existe,', id);
-            return null;
+            throw new Error('Experiencia não encontrada para exclusão.');
         }
 
         console.error('Erro ao deletar experiencia:', error)

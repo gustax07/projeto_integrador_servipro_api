@@ -9,6 +9,8 @@ import Logger from './config/logger';
 import routes from './routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocs } from './config/swagger';
+import { AppError } from './utils/AppError';
+import { Request, Response, NextFunction } from 'express';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -27,6 +29,33 @@ const stream = {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms', { stream }));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(routes)
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof AppError) {
+      Logger.error(err.message);
+        return res.status(err.statusCode).json({
+            status: 'error',
+            message: err.message
+        });
+    }
+
+    if (err.name === 'PrismaClientKnownRequestError') {
+         console.error('Erro de Banco de Dados:', err);
+         Logger.error(err.message);
+         return res.status(400).json({
+             status: 'error',
+             message: 'Ocorreu um erro ao processar os dados no banco.'
+         });
+    }
+
+    console.error('Erro Interno Crítico:', err);
+    Logger.error(err.message);
+    return res.status(500).json({
+        status: 'error',
+        message: 'Erro interno do servidor. Tente novamente mais tarde.'
+    });
+});
+  
 
 // Start server
 app.listen(Number(port), '0.0.0.0', () => {

@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma'
 import { Prisma } from '@prisma/client'
+import { AppError } from '../utils/AppError';
 
 export const createSetor = async (data: Prisma.SetorCreateInput) => {
     try {
@@ -27,7 +28,7 @@ export const getSetorById = async (id: number) => {
         })
 
         if (!setor) {
-            throw new Error('Setor nao encontrado.')
+            throw new AppError('Setor não encontrado.')
         }
 
         return setor;

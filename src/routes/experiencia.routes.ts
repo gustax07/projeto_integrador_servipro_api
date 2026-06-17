@@ -141,8 +141,8 @@ router.get('/', e.getAllExperiencias);
  *         required: true
  *         description: ID Numerico do Curriculo.
  *         schema:
- *           type: integer
- *           example: 1
+ *            type: integer
+ *            example: 1
  *     responses:
  *       201:
  *         description: Experiencia Editada com Sucesso!
@@ -172,7 +172,7 @@ router.patch('/:id', validateSchema(experienciaUpdateSchema), e.updateExperienci
  *         schema:
  *            type: integer
  *            example: 1
- *       - in: path
+ *       - in: query
  *         name: curriculoId
  *         required: true
  *         description: ID Numerico do Curriculo.
@@ -189,6 +189,6 @@ router.patch('/:id', validateSchema(experienciaUpdateSchema), e.updateExperienci
  *       500:
  *         description: Erro interno do servidor.
  */
-router.delete('/:id/:curriculoId', e.deleteExperiencia);
+router.delete('/:id', e.deleteExperiencia);
 
 export default router;

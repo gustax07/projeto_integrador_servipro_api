@@ -49,8 +49,10 @@ export const getAllCurriculos = async (req: Request, res: Response) => {
 export const updateCurriculo = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.userId) return res.status(401).json({ error: "Usuário não autenticado" });
-        const { id, idExperencia, idCurso} = req.params;
-        await curriculoService.updateCurriculo(Number(id), Number(req.userId),req.body, Number(idExperencia), Number(idCurso));
+        const { id } = req.params;
+        const {idExperencia, idCurso} = req.query
+        
+        await curriculoService.updateCurriculo(Number(id), Number(req.userId), req.body, Number(idExperencia), Number(idCurso));
         return res.status(201).json({ 'status': 'success', 'message': 'curriculo atualizado com sucesso!' });
     } catch (error: any) {
         Logger.error("Erro ao atualizar curriculo", error);

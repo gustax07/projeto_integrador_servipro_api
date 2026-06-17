@@ -10,6 +10,7 @@ import cursoRouter from './curso.routes';
 import curriculoRouter from './curriculo.routes';
 import perfilRouter from './perfil.routes';
 import experienciaRouter from './experiencia.routes';
+import mensagemRouter from './mensagem.routes';
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use('/endereco', enderecoRouter);
 router.use('/experiencia', experienciaRouter);
 router.use('/habilidade', habilidadeRouter);
 router.use('/login', loginRouter);
+router.use('/mensagem', mensagemRouter);
 router.use('/perfil', perfilRouter);
 router.use('/servico', servicoRouter);
 router.use('/setor', setorRouter);

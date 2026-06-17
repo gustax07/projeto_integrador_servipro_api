@@ -18,10 +18,31 @@ const swaggerOptions = {
           description: 'Insira o token JWT gerado no login para acessar esta rota.',
         },
       },
+      responses: {
+        InternalServerError: {
+          description: 'Erro interno do servidor.',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  status: {
+                    type: 'string',
+                    example: 'error'
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Erro interno do servidor. Tente novamente mais tarde.'
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
   },
-
-  apis: ['./src/routes/*.ts'], 
+  apis: ['./src/routes/*.ts'],
 };
 
 export const swaggerDocs = swaggerJsdoc(swaggerOptions);

@@ -161,6 +161,7 @@ model Mensagem {
   id       Int      @id @default(autoincrement())
   conteudo String   @db.Text
   lida     Boolean  @default(false)
+  editado  Boolean  @default(false) @map("editado")
   criadoEm DateTime @default(now()) @map("criado_em")
 
   remetenteId    Int @map("remetente_id")

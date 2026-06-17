@@ -1,6 +1,7 @@
 import { Response, Request } from "express";
 import * as setorService from '../services/setor.service';
 import Logger from "../config/logger";
+import { AppError } from "../utils/AppError";
 
 export const createSetor = async (req: Request, res: Response) => {
     try {
@@ -16,17 +17,8 @@ export const createSetor = async (req: Request, res: Response) => {
 }
 
 export const getSetorById = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const setor = await setorService.getSetorById(Number(id));
-        return res.status(200).json({ setor });
-    } catch (error: any) {
-        Logger.error("Erro ao buscar setor", error);
-        if (error.message === 'Setor nao encontrado.') {
-            return res.status(404).json({ error: "Setor nao encontrado." });
-        }
-        return res.status(500).json({ error: "Erro ao buscar setor" });
-    }
+        const setor = await setorService.getSetorById(Number(req.params.id));
+        return res.status(200).json({ setor });  
 }
 
 export const getAllSetores = async (req: Request, res: Response) => {
@@ -35,8 +27,8 @@ export const getAllSetores = async (req: Request, res: Response) => {
         return res.status(200).json({ setores });
     } catch (error: any) {
         Logger.error("Erro ao buscar setores", error);
-        if (error.message === 'Nenhum setor encontrado') {
-            return res.status(404).json({ error: error.message});
+        if (error instanceof AppError) {
+            return res.status(error.statusCode).json({ error: error.message });
         }
         return res.status(500).json({ error: "Erro ao buscar setores" });
     }
