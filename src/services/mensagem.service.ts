@@ -13,46 +13,88 @@ export const createMensagem = async (data: Prisma.MensagemUncheckedCreateInput, 
                 id: true
             }
         })
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erro ao criar mensagem:', error)
+        if (error.code == 'P2003') {
+            throw new AppError("Destinatario não encontrado")
+        }
         throw error
     }
 }
 
 export const getMensagemById = async (id: number, remetenteId: number, destinatarioId: number) => {
     try {
-        const mensagem = await prisma.mensagem.findFirst({
+        const mensagens = await prisma.mensagem.findMany({
             where: {
                 id,
                 remetenteId,
-                destinatarioId
+                destinatarioId,
             },
+            select: {
+                id: true,
+                conteudo: true,
+                remetenteId: true,
+                destinatarioId: true,
+                remetente: {
+                    select: {
+                        nome: true,
+                        id: true
+                    }
+                },
+                destinatario: {
+                    select: {
+                        nome: true,
+                        id: true
+                    }
+                }
+            }
         })
 
-        if (!mensagem) {
+        if (!mensagens) {
             throw new AppError('Mensagem não encontrada ou não pertence a este usuário.', 404)
         }
 
-        return mensagem
+        return mensagens
     } catch (error) {
         console.error('Erro ao buscar mensagem por ID:', error)
         throw error
     }
 }
 
-export const getAllMensagens = async (page: number = 1, limit: number = 20) => {
+export const getAllMensagens = async (page: number = 1, limit: number = 20, remetenteId: number) => {
     try {
         const skip = (page - 1) * limit;
         const mensagens = await prisma.mensagem.findMany({
+            where: {
+                remetenteId,
+            },
             skip,
             take: limit,
             orderBy: {
-                id: 'desc'
+                criadoEm: 'desc'
             },
+            select: {
+                id: true,
+                conteudo: true,
+                lida: true,
+                editado: true,
+                remetente: {
+                    select: {
+                        nome: true,
+                        id: true
+                    }
+                },
+                destinatario: {
+                    select: {
+                        nome: true,
+                        id: true
+                    }
+                }
+            }
         })
 
-        if (!mensagens) {
-            throw new Error('Nenhuma mensagem encontrada.')
+        if (mensagens.length === 0) {
+            throw new AppError('Nenhuma mensagem encontrada.', 404)
         }
 
         return mensagens
@@ -70,7 +112,10 @@ export const updateMensagem = async (id: number, remetenteId: number, destinatar
                 remetenteId,
                 destinatarioId
             },
-            data,
+            data: {
+                ...data,
+                editado: true
+            },
             select: {
                 id: true
             },
@@ -98,8 +143,7 @@ export const deleteMensagem = async (id: number, remetenteId: number, destinatar
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar uma mensagem que não existe:', id);
-            return null;
+            throw new AppError('Mensagem não encontrada para deletar.', 404);
         }
 
         console.error('Erro ao deletar mensagem:', error)

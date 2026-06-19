@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
 
 export const createCurriculo = async (data: any) => {
     try {
@@ -32,7 +33,7 @@ export const createCurriculo = async (data: any) => {
         })
     } catch (error: any) {
         if (error.code === 'P2002') {
-            throw new Error('O usuário já possui um currículo cadastrado.');
+            throw new AppError('O usuário já possui um currículo cadastrado.', 400);
         }
         console.error('Erro ao criar curriculo:', error)
         throw error
@@ -70,7 +71,7 @@ export const getCurriculoById = async (id: number, userId: number) => {
             }
         })
         if (!curriculo) {
-            throw new Error('Curriculo não encontrado ou não pertence a este usuário.')
+            throw new AppError('Curriculo não encontrado ou não pertence a este usuário.', 404)
         }
 
         return curriculo
@@ -114,7 +115,7 @@ export const getAllCurriculos = async (page: number = 1, limit: number = 20) => 
         })
 
         if (curriculos.length === 0) {
-            throw new Error('Nenhum curriculo encontrado.')
+            throw new AppError('Nenhum curriculo encontrado.', 404)
         }
 
         return curriculos
@@ -125,10 +126,10 @@ export const getAllCurriculos = async (page: number = 1, limit: number = 20) => 
 }
 
 export const updateCurriculo = async (
-    id: number, 
-    userId: number, 
-    data: any, 
-    idExperencia?: number, 
+    id: number,
+    userId: number,
+    data: any,
+    idExperencia?: number,
     idCurso?: number
 ) => {
     try {
@@ -168,8 +169,8 @@ export const updateCurriculo = async (
                                 where: {
                                     nome: h.nome
                                 },
-                                create: { 
-                                    nome: h.nome 
+                                create: {
+                                    nome: h.nome
                                 }
                             }
                         }
@@ -180,14 +181,14 @@ export const updateCurriculo = async (
                 id: true
             },
         })
-        
+
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Currículo não encontrado para atualização.');
+            throw new AppError('Currículo não encontrado para atualização.', 404);
         }
         if (error.code === 'P2002') {
             console.warn('Tentativa de criar experiência ou curso duplicado para o currículo:', { id, data });
-            throw new Error('Experiência ou curso com os mesmos dados já existe para este currículo.');
+            throw new AppError('Experiência ou curso com os mesmos dados já existe para este currículo.', 400);
         }
         console.error('Erro ao atualizar currículo:', error)
         throw error
@@ -207,8 +208,7 @@ export const deleteCurriculo = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            console.warn('Tentativa de deletar um curriculo que não existe:', id);
-            return null;
+            throw new AppError('Currículo não encontrado para atualização.', 404);
         }
 
         console.error('Erro ao deletar curriculo:', error)

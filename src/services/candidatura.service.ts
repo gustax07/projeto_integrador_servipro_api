@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
-import { Numeric } from "zod/v4/core/util.cjs";
+import { AppError } from "../utils/AppError";
 
 export const createCandidatura = async (data: Prisma.CandidaturaCreateInput) => {
     try {
@@ -12,10 +12,10 @@ export const createCandidatura = async (data: Prisma.CandidaturaCreateInput) => 
         })
     } catch (error:any) {
         if (error.code === 'P2002') {
-            throw new Error('Candidatura já cadastrada no sistema.');
+            throw new AppError('Candidatura já cadastrada no sistema.');
         }
         if (error.code === 'P2003') {
-            throw new Error('Serviço ou usuário não encontrado.');
+            throw new AppError('Serviço ou usuário não encontrado.');
         }
         console.error('Erro ao criar candidatura:', error)
         throw error
@@ -38,7 +38,7 @@ export const getCandidaturaById = async (id: number, userId: number) => {
         })
 
         if (!candidatura) {
-            throw new Error('Candidatura não encontrada ou não pertence a este usuário.')
+            throw new AppError('Candidatura não encontrada ou não pertence a este usuário.')
         }
 
         return candidatura
@@ -68,8 +68,8 @@ export const getAllCandidaturas = async (userId: number, page: number = 1, limit
             }
         })
 
-        if (!candidaturas) {
-            throw new Error('Nenhuma candidatura encontrada.')
+        if (candidaturas.length === 0) {
+            throw new AppError('Nenhuma candidatura encontrada.')
         }
 
         return candidaturas
@@ -93,13 +93,13 @@ export const updateCandidatura = async (id: number, userId: number, data: Prisma
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Candidatura não encontrada para atualização.');
+            throw new AppError('Candidatura não encontrada para atualização.');
         }
         if (error.code === 'P2003') {
-            throw new Error('Serviço ou usuário não encontrado.');
+            throw new AppError('Serviço ou usuário não encontrado.');
         }
         if (error.code === 'P2002') {
-            throw new Error('Candidatura já cadastrada no sistema.');
+            throw new AppError('Candidatura já cadastrada no sistema.');
         }
         console.error('Erro ao atualizar candidatura:', error)
         throw error
@@ -119,7 +119,7 @@ export const deleteCandidatura = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Candidatura não encontrada para exclusão.');
+            throw new AppError('Candidatura não encontrada para exclusão.');
         }
 
         console.error('Erro ao deletar candidatura:', error)

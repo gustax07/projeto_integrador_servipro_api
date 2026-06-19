@@ -71,7 +71,14 @@ router.post('/', validateSchema(cursoCreateSchema), createCurso);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID da habilidade a ser atualizada.
+ *         description: ID do curso.
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *       - in: query
+ *         name: curriculoId
+ *         required: true
+ *         description: ID do currículo.
  *         schema:
  *            type: integer
  *            example: 1
@@ -125,7 +132,14 @@ router.get('/', getAllCursos);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID da habilidade a ser atualizada.
+ *         description: ID do curso a ser atualizado.
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *       - in: query
+ *         name: curriculoId
+ *         required: true
+ *         description: ID do currículo.
  *         schema:
  *            type: integer
  *            example: 1
@@ -186,7 +200,14 @@ router.patch('/:id', validateSchema(cursoUpdateSchema), updateCurso);
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID da habilidade a ser deletada.
+ *         description: ID do curso a ser deletado.
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *       - in: query
+ *         name: curriculoId
+ *         required: true
+ *         description: ID do currículo.
  *         schema:
  *            type: integer
  *            example: 1

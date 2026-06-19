@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
 
 export const createEndereco = async (data: Prisma.EnderecoCreateInput) => {
     try {
@@ -29,7 +30,7 @@ export const getEnderecoById = async (id: number, userId: number) => {
             }
         });
         if (!endereco) {
-            throw new Error('Endereço não encontrado ou não pertence a este usuário.');
+            throw new AppError('Endereço não encontrado ou não pertence a este usuário.', 404);
         }
 
         return endereco;
@@ -68,7 +69,7 @@ export const getAllEnderecos = async (page: number = 1, limit: number = 20, user
         })
 
         if (endereco.length === 0) {
-            throw new Error('Nenhum endereço encontrado para este usuário.');
+            throw new AppError('Nenhum endereço encontrado para este usuário.', 400);
         }
 
         return endereco;
@@ -92,7 +93,7 @@ export const updateEndereco = async (id: number, userId: number, data: Prisma.En
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Endereço ou usuário não encontrado.');
+            throw new AppError('Endereço ou usuário não encontrado.', 404);
         }
         console.error('Erro ao atualizar endereço:', error);
         throw error;
@@ -112,7 +113,7 @@ export const deleteEndereco = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Endereço ou usuário não encontrado.');
+            throw new AppError('Endereço ou usuário não encontrado.', 404);
         }
 
         console.error('Erro ao deletar endereço:', error);

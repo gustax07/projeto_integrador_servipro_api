@@ -1,56 +1,41 @@
 import { Response, Request } from "express";
 import * as cursoService from '../services/curso.service';
-import Logger from "../config/logger";
 
 export const createCurso = async (req: Request, res: Response) => {
-    try {
-        await cursoService.createCurso(req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'curso criado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao criar curso", error);
-        return res.status(500).json({ error: "Erro ao criar curso" });
-    }
+    await cursoService.createCurso(req.body);
+    return res.status(201).json({ 'status': 'success', 'message': 'curso criado com sucesso!' });
 }
 
 export const getCursoById = async (req: Request, res: Response) => {
-    try {
-        const { id, curriculoId } = req.params;
-        const curso = await cursoService.getCursoById(Number(id), Number(curriculoId));
-        return res.status(201).json({ curso });
-    } catch (error) {
-        Logger.error("Erro ao buscar curso", error);
-        return res.status(500).json({ error: "Erro ao buscar curso" });
-    }
+    const { id } = req.params;
+    const { curriculoId } = req.query;
+    if (!curriculoId) { return res.status(400).json({ 'status': 'error', 'message': 'Curriculo ID é obrigatório.' }); }
+    if (!id) { return res.status(400).json({ 'status': 'error', 'message': 'Curso ID é obrigatório.' }); }
+    const curso = await cursoService.getCursoById(Number(id), Number(curriculoId));
+    return res.status(201).json({ curso });
 }
 
 export const getAllCursos = async (req: Request, res: Response) => {
-    try {
-        const cursos = await cursoService.getAllCursos();
-        return res.status(201).json({ cursos });
-    } catch (error) {
-        Logger.error("Erro ao buscar curso", error);
-        return res.status(500).json({ error: "Erro ao buscar curso" });
-    }
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 20;
+    const cursos = await cursoService.getAllCursos(page, limit);
+    return res.status(200).json({ cursos });
 }
 
 export const updateCurso = async (req: Request, res: Response) => {
-    try {
-        const { id, curriculoId } = req.params;
-        await cursoService.updateCurso(Number(id), Number(curriculoId), req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'curso atualizado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao atualizar curso", error);
-        return res.status(500).json({ error: "Erro ao atualizar curso" });
-    }
+    const { id } = req.params;
+    const { curriculoId } = req.query;
+    if (!curriculoId) { return res.status(400).json({ 'status': 'error', 'message': 'Curriculo ID é obrigatório.' }); }
+    if (!id) { return res.status(400).json({ 'status': 'error', 'message': 'Curso ID é obrigatório.' }); }
+    await cursoService.updateCurso(Number(id), Number(curriculoId), req.body);
+    return res.status(201).json({ 'status': 'success', 'message': 'curso atualizado com sucesso!' });
 }
 
 export const deleteCurso = async (req: Request, res: Response) => {
-    try {
-        const { id, curriculoId } = req.params;
-        await cursoService.deleteCurso(Number(id), Number(curriculoId));
-        return res.status(201).json({ 'status': 'success', 'message': 'curso deletado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao deletar curso", error);
-        return res.status(500).json({ error: "Erro ao deletar curso" });
-    }
+    const { id } = req.params;
+    const { curriculoId } = req.query;
+    if (!curriculoId) { return res.status(400).json({ 'status': 'error', 'message': 'Curriculo ID é obrigatório.' }); }
+    if (!id) { return res.status(400).json({ 'status': 'error', 'message': 'Curso ID é obrigatório.' }); }
+    await cursoService.deleteCurso(Number(id), Number(curriculoId));
+    return res.status(201).json({ 'status': 'success', 'message': 'curso deletado com sucesso!' });
 }
