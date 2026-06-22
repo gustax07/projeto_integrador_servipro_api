@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
 
 export const createHabilidade = async (data: Prisma.HabilidadeCreateInput) => {
     try {
@@ -12,7 +13,7 @@ export const createHabilidade = async (data: Prisma.HabilidadeCreateInput) => {
     } catch (error: any) {
         console.error('Erro ao criar habilidade:', error)
         if (error.code === 'P2002') {
-            throw new Error('Habilidade já cadastrada no sistema.');
+            throw new AppError('Habilidade já cadastrada no sistema.', 400);
         }
         throw error
     }
@@ -27,7 +28,7 @@ export const getHabilidadeById = async (id: number) => {
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Habilidade não encontrada.')
+            throw new AppError('Habilidade não encontrada.', 404)
         }
         console.error('Erro ao buscar habilidade por ID:', error)
         throw error
@@ -48,7 +49,7 @@ export const getAllHabilidades = async (page: number = 1, limit: number = 20) =>
     } catch (error: any) {
         console.error('Erro ao buscar todas habilidades:', error)
         if (error.code === 'P2025') {
-            throw new Error('Nenhuma habilidade encontrada.')
+            throw new AppError('Nenhuma habilidade encontrada.', 404)
         }
         throw error
     }
@@ -67,10 +68,10 @@ export const updateHabilidade = async (id: number, data: Prisma.HabilidadeUpdate
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Habilidade não encontrada para atualização.');
+            throw new AppError('Habilidade não encontrada para atualização.', 404);
         }
         if (error.code === 'P2002') {
-            throw new Error('Já existe uma habilidade com este nome.')
+            throw new AppError('Já existe uma habilidade com este nome.', 400);
         }
         console.error('Erro ao atualizar habilidade:', error)
         throw error
@@ -89,7 +90,7 @@ export const deleteHabilidade = async (id: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Habilidade não encontrada para exclusão.')
+            throw new AppError('Habilidade não encontrada para exclusão.', 404);
         }
         console.error('Erro ao deletar habilidade:', error)
         throw error

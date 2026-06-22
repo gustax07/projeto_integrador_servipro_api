@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma'
 import { Prisma } from '@prisma/client'
+import { AppError } from '../utils/AppError';
 
 export const createServico = async (data: Prisma.ServicoCreateInput) => {
     try {
@@ -14,10 +15,10 @@ export const createServico = async (data: Prisma.ServicoCreateInput) => {
     } catch (error: any) {
 
         if (error.code === 'P2002') {
-            throw new Error('Serviço já cadastrado no sistema.');
+            throw new AppError('Serviço já cadastrado no sistema.', 400);
         }
         if (error.code === 'P2003') {
-            throw new Error('Setor ou usuário não encontrado.');
+            throw new AppError('Setor ou usuário não encontrado.', 404);
         }
 
         console.error('Erro ao criar serviço:', error)
@@ -38,7 +39,7 @@ export const getServicoById = async (id: number, userId: number) => {
             }
         })
         if (!servico) {
-            throw new Error('Serviço não encontrado ou não pertence a este usuário.')
+            throw new AppError('Serviço não encontrado ou não pertence a este usuário.', 404);
         }
 
         return servico;
@@ -63,7 +64,7 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
         })
 
         if (servicos.length === 0) {
-            throw new Error('Nenhum serviço encontrado.')
+            throw new AppError('Nenhum serviço encontrado.', 404);
         }
 
         return servicos;
@@ -86,13 +87,13 @@ export const updateServico = async (id: number, userId: number, data: Prisma.Ser
             },
         })
         if (!servico) {
-            throw new Error('Já existe um serviço com este nome.')
+            throw new AppError('Já existe um serviço com este nome.', 400)
         }
 
         return servico;
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Serviço não encontrado para atualização.');
+            throw new AppError('Serviço não encontrado para atualização.', 404);
         }
         console.error('Erro ao atualizar serviço:', error)
         throw error
@@ -112,7 +113,7 @@ export const deleteServico = async (id: number, userId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Serviço não encontrado para exclusão.');
+            throw new AppError('Serviço não encontrado para exclusão.', 404);
         }
 
         console.error('Erro ao deletar serviço:', error)

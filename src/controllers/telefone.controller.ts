@@ -1,56 +1,34 @@
 import { Response, Request } from "express";
 import * as telefoneService from '../services/telefone.service';
-import Logger from "../config/logger";
+import { AuthRequest } from "../middleware/auth.middleware";
 
-export const createTelefone = async (req: Request, res: Response) => {
-    try {
-        await telefoneService.createTelefone(req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'telefone criado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao criar telefone", error);
-        return res.status(500).json({ error: "Erro ao criar telefone" });
-    }
+export const createTelefone = async (req: AuthRequest, res: Response) => {
+    await telefoneService.createTelefone(req.body, req.userId!);
+    return res.status(201).json({ 'status': 'success', 'message': 'telefone criado com sucesso!' });
 }
 
-export const getTelefoneById = async (req: Request, res: Response) => {
-    try {
-        const { id, userId } = req.params;
-        const telefone = await telefoneService.getTelefoneById(Number(id), Number(userId));
-        return res.status(200).json({ telefone });
-    } catch (error) {
-        Logger.error("Erro ao buscar telefone", error);
-        return res.status(500).json({ error: "Erro ao buscar telefone" });
-    }
+export const getTelefoneById = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const telefone = await telefoneService.getTelefoneById(req.userId!, Number(id));
+    return res.status(200).json({ telefone });
 }
 
-export const getAllTelefones = async (req: Request, res: Response) => {
-    try {
-        const telefones = await telefoneService.getAllTelefones();
-        return res.status(200).json({ telefones });
-    } catch (error) {
-        Logger.error("Erro ao buscar telefones", error);
-        return res.status(500).json({ error: "Erro ao buscar telefones" });
-    }
+export const getAllTelefones = async (req: AuthRequest, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    
+    const telefones = await telefoneService.getAllTelefones(page, limit);
+    return res.status(200).json({ telefones });
 }
 
-export const updateTelefone = async (req: Request, res: Response) => {
-    try {
-        const { id, userId } = req.params;
-        await telefoneService.updateTelefone(Number(id), Number(userId), req.body);
-        return res.status(200).json({ 'status': 'success', 'message': 'telefone atualizado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao atualizar telefone", error);
-        return res.status(500).json({ error: "Erro ao atualizar telefone" });
-    }
+export const updateTelefone = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    await telefoneService.updateTelefone(Number(id), req.userId!, req.body);
+    return res.status(200).json({ 'status': 'success', 'message': 'telefone atualizado com sucesso!' });
 }
 
-export const deleteTelefone = async (req: Request, res: Response) => {
-    try {
-        const { id, userId } = req.params;
-        await telefoneService.deleteTelefone(Number(id), Number(userId));
-        return res.status(201).json({ 'status': 'success', 'message': 'telefone deletado com sucesso!' });
-    } catch (error) {
-        Logger.error("Erro ao deletar telefone", error);
-        return res.status(500).json({ error: "Erro ao deletar telefone" });
-    }
+export const deleteTelefone = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    await telefoneService.deleteTelefone(Number(id), req.userId!);
+    return res.status(201).json({ 'status': 'success', 'message': 'telefone deletado com sucesso!' });
 }

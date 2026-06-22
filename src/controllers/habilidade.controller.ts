@@ -1,68 +1,33 @@
 import { Response, Request } from "express";
 import * as habilidadeService from '../services/habilidade.service';
-import Logger from "../config/logger";
 
 export const createHabilidade = async (req: Request, res: Response) => {
-    try {
-        await habilidadeService.createHabilidade(req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'habilidade criada com sucesso!' });
-    } catch (error: any) {
-        Logger.error("Erro ao criar habilidade", error);
-        if (error.message) {
-            return res.status(400).json({ error: error.message });
-        }
-        return res.status(500).json({ error: "Erro ao criar habilidade" });
-    }
+    await habilidadeService.createHabilidade(req.body);
+    return res.status(201).json({ 'status': 'success', 'message': 'habilidade criada com sucesso!' });
 }
 
 export const getHabilidadeById = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const habilidade = await habilidadeService.getHabilidadeById(Number(id));
-        return res.status(201).json({ habilidade });
-    } catch (error: any) {
-        Logger.error("Erro ao buscar habilidade", error);
-        if (error.message) {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: "Erro ao buscar habilidade" });
-    }
+    const { id } = req.params;
+    if (!id) { return res.status(404).json({ error: "ID de Habilidade não encontrado." }); }
+    const habilidade = await habilidadeService.getHabilidadeById(Number(id));
+    return res.status(201).json({ habilidade });
 }
 
 export const getAllHabilidades = async (req: Request, res: Response) => {
-    try {
-        const habilidades = await habilidadeService.getAllHabilidades();
-        return res.status(201).json({ habilidades });
-    } catch (error) {
-        Logger.error("Erro ao buscar habilidades", error);
-        return res.status(500).json({ error: "Erro ao buscar habilidades" });
-    }
+    const habilidades = await habilidadeService.getAllHabilidades();
+    return res.status(201).json({ habilidades });
 }
 
 export const updateHabilidade = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        await habilidadeService.updateHabilidade(Number(id), req.body);
-        return res.status(201).json({ 'status': 'success', 'message': 'habilidade atualizada com sucesso!' });
-    } catch (error: any) {
-        Logger.error("Erro ao atualizar habilidade", error);
-        if (error.message) {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: "Erro ao atualizar habilidade" });
-    }
+    const { id } = req.params;
+    if (!id) { return res.status(404).json({ error: "ID de Habilidade não encontrado." }); }
+    await habilidadeService.updateHabilidade(Number(id), req.body);
+    return res.status(201).json({ 'status': 'success', 'message': 'habilidade atualizada com sucesso!' });
 }
 
 export const deleteHabilidade = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        await habilidadeService.deleteHabilidade(Number(id));
-        return res.status(201).json({ 'status': 'success', 'message': 'habilidade deletado com sucesso!' });
-    } catch (error: any) {
-        Logger.error("Erro ao deletar habilidade", error);
-        if (error.message) {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: "Erro ao deletar habilidade" });
-    }
+    const { id } = req.params;
+    if (!id) { return res.status(404).json({ error: "ID de Habilidade não encontrado." }); }
+    await habilidadeService.deleteHabilidade(Number(id));
+    return res.status(201).json({ 'status': 'success', 'message': 'habilidade deletado com sucesso!' });
 }

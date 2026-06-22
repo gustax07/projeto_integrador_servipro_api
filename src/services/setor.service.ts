@@ -12,7 +12,7 @@ export const createSetor = async (data: Prisma.SetorCreateInput) => {
         })
     } catch (error: any) {
         if (error.code === 'P2002') {
-            throw new Error('Já existe um setor com este nome.');
+            throw new AppError('Já existe um setor com este nome.', 400);
         }
         console.error('Erro ao criar setor:', error)
         throw error
@@ -28,7 +28,7 @@ export const getSetorById = async (id: number) => {
         })
 
         if (!setor) {
-            throw new AppError('Setor não encontrado.')
+            throw new AppError('Setor não encontrado.', 404)
         }
 
         return setor;
@@ -53,8 +53,8 @@ export const getAllSetores = async (page: number = 1, limit: number = 20) => {
             }
         })
 
-       if (setores.length === 0) {
-            throw new Error('Nenhum setor encontrado')
+        if (setores.length === 0) {
+            throw new AppError('Nenhum setor encontrado', 404)
         }
 
         return setores;
@@ -77,7 +77,7 @@ export const updateSetor = async (id: number, data: Prisma.SetorUpdateInput) => 
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Setor não encontrado para atualização.');
+            throw new AppError('Setor não encontrado para atualização.', 404);
         }
         console.error('Erro ao atualizar setor:', error)
         throw error
@@ -96,7 +96,7 @@ export const deleteSetor = async (id: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Tentativa de deletar um setor que não existe',);
+            throw new AppError('Tentativa de deletar um setor que não existe', 404);
         }
 
         console.error('Erro ao deletar setor:', error)

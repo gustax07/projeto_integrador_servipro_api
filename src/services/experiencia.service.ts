@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
 
 export const createExperiencia = async (data: Prisma.ExperienciaCreateInput) => {
     try {
@@ -16,7 +17,7 @@ export const createExperiencia = async (data: Prisma.ExperienciaCreateInput) => 
     } catch (error: any) {
         console.error('Erro ao criar experiencia:', error)
         if (error.code === 'P2003') {
-            throw new Error('Curriculo não encontrado.');
+            throw new AppError('Curriculo não encontrado.', 404);
         }
         throw error
     }
@@ -37,7 +38,7 @@ export const getExperienciaById = async (id: number) => {
         })
 
         if (!experiencia) {
-            throw new Error('Experiencia não encontrada ou não pertence a este usuário.')
+            throw new AppError('Experiencia não encontrada ou não pertence a este usuário.', 404);
         }
 
         return experiencia
@@ -62,7 +63,7 @@ export const getAllExperiencias = async (page: number = 1, limit: number = 20) =
         })
 
         if (!experiencias) {
-            throw new Error('Nenhuma experiencia encontrada.')
+            throw new AppError('Nenhuma experiencia encontrada.', 404);
         }
 
         return experiencias
@@ -90,7 +91,7 @@ export const updateExperiencia = async (id: number, curriculoId: number, data: P
         })
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Experiencia não encontrada para atualização.');
+            throw new AppError('Experiencia não encontrada para atualização.', 404);
         }
         console.error('Erro ao atualizar experiencia:', error)
         throw error
@@ -110,7 +111,7 @@ export const deleteExperiencia = async (id: number, curriculoId: number) => {
         });
     } catch (error: any) {
         if (error.code === 'P2025') {
-            throw new Error('Experiencia não encontrada para exclusão.');
+            throw new AppError('Experiencia não encontrada para exclusão.', 404);
         }
 
         console.error('Erro ao deletar experiencia:', error)
