@@ -57,13 +57,22 @@ export const getAllPerfis = async (page: number = 1, limit: number = 20) => {
             orderBy: {
                 id: 'desc'
             },
+            where: {
+                exibirPerfil: true
+            },
             omit: {
                 userId: true,
-                setorId: true
+                setorId: true,
             },
             include: {
-                setor: true
-            }
+                setor: true,
+                user: {
+                    select: {
+                        id: true,
+                        nome: true
+                    }
+                }
+            },
         })
 
         if (perfil.length === 0) {
