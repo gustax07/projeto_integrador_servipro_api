@@ -16,6 +16,12 @@ export const getCandidaturaById = async (req: AuthRequest, res: Response) => {
     return res.status(200).json({ candidatura });
 }
 
+export const getAllCandidaturasByIdServico = async (req: Request, res: Response) => {
+    const { idServico } = req.params;
+    const candidaturas = await candidaturaService.getAllCandidaturasByIdServico(Number(idServico));
+    return res.status(200).json({ candidaturas });
+}
+
 export const getAllCandidaturas = async (req: AuthRequest, res: Response) => {
     if (!req.userId) {
         return res.status(404).json({ error: "Usuário não autenticado" });

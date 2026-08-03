@@ -10,7 +10,7 @@ export const createCandidatura = async (data: Prisma.CandidaturaCreateInput) => 
                 id: true
             }
         })
-    } catch (error:any) {
+    } catch (error: any) {
         if (error.code === 'P2002') {
             throw new AppError('Candidatura já cadastrada no sistema.');
         }
@@ -44,6 +44,34 @@ export const getCandidaturaById = async (id: number, userId: number) => {
         return candidatura
     } catch (error) {
         console.error('Erro ao buscar candidatura por ID:', error)
+        throw error
+    }
+}
+
+export const getAllCandidaturasByIdServico = async (idServico: number) => {
+    try {
+        const candidaturas = await prisma.candidatura.findMany({
+            where: {
+                servicoId: idServico,
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        email: true,
+                    }
+                }
+            }
+        })
+
+        if (candidaturas.length === 0) {
+            throw new AppError('Nenhuma candidatura encontrada.')
+        }
+
+        return candidaturas
+    } catch (error) {
+        console.error('Erro ao buscar todas candidaturas por ID do serviço:', error)
         throw error
     }
 }

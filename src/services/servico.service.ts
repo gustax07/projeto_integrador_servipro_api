@@ -2,18 +2,29 @@ import { prisma } from '../lib/prisma'
 import { Prisma } from '@prisma/client'
 import { AppError } from '../utils/AppError';
 
-export const createServico = async (data: Prisma.ServicoCreateInput) => {
+interface CreateServicoInput extends Prisma.ServicoUncheckedCreateInput {
+    imagens?: { url: string; tipo: string; principal?: boolean }[];
+}
+
+export const createServico = async (data: CreateServicoInput) => {
+    const { imagens, ...servicoData } = data;
     try {
         return await prisma.servico.create({
-            data:{
-                ...data,
+            data: {
+                ...servicoData,
+                imagemServicos: imagens && imagens.length > 0 ? {
+                    create: imagens.map(img => ({
+                        url: img.url,
+                        tipo: img.tipo,
+                        principal: img.principal ?? false
+                    }))
+                } : undefined
             },
             select: {
                 id: true
             }
-        })
+        });
     } catch (error: any) {
-
         if (error.code === 'P2002') {
             throw new AppError('Serviço já cadastrado no sistema.', 400);
         }
@@ -33,9 +44,28 @@ export const getServicoById = async (id: number, userId: number) => {
                 id,
                 userId
             },
-            omit: {
-                userId: true,
-                setorId: true
+            select: {
+                id: true,
+                titulo: true,
+                descricao: true,
+                formato: true,
+                salario: true,
+                tipoSalario: true,
+                dataPostagem: true,
+                setor: {
+                    select: {
+                        id: true,
+                        nome: true
+                    }
+                },
+                imagemServicos: {
+                    select: {
+                        id: true,
+                        url: true,
+                        tipo: true,
+                        principal: true
+                    }
+                }
             }
         })
         if (!servico) {
@@ -58,8 +88,28 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
             orderBy: {
                 id: 'desc'
             },
-            omit: {
-                setorId: true
+            select: {
+                id: true,
+                titulo: true,
+                descricao: true,
+                formato: true,
+                salario: true,
+                tipoSalario: true,
+                dataPostagem: true,
+                setor: {
+                    select: {
+                        id: true,
+                        nome: true
+                    }
+                },
+                imagemServicos: {
+                    select: {
+                        id: true,
+                        url: true,
+                        tipo: true,
+                        principal: true
+                    }
+                }
             }
         })
 
@@ -74,7 +124,7 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
     }
 }
 
-export const updateServico = async (id: number, userId: number, data: Prisma.ServicoUpdateInput) => {
+export const updateServico = async (id: number, userId: number, data: Partial<Prisma.ServicoUpdateInput>) => {
     try {
         const servico = await prisma.servico.update({
             where: {

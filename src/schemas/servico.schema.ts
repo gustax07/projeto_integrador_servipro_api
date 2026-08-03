@@ -9,6 +9,11 @@ export const createServicoSchema = z.object({
     tipoSalario: z.string("o tipoSalario deve ser uma string"),
     userId: z.number("o userId deve ser um numero"),
     setorId: z.number("o setorId deve ser um numero"),
+    imagens: z.array(z.object({
+        url: z.string("a url deve ser uma string"),
+        tipo: z.string("o tipo deve ser uma string"),
+        principal: z.boolean("o principal deve ser um booleano").optional(),
+    })).optional()
 })
 
 export const updateServicoSchema = createServicoSchema.partial();

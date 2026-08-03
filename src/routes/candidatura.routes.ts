@@ -1,10 +1,40 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
-import { createCandidatura, getCandidaturaById, getAllCandidaturas, updateCandidatura, deleteCandidatura } from '../controllers/candidatura.controller';
+import { createCandidatura, getCandidaturaById, getAllCandidaturas, getAllCandidaturasByIdServico, updateCandidatura, deleteCandidatura } from '../controllers/candidatura.controller';
 import { validateSchema } from '../middleware/validate.middlware';
 import { createCandidaturaSchema, updateCandidaturaSchema } from '../schemas/candidatura.schema';
 
 const router = Router();
+
+/**
+ * @openapi
+ * /candidatura/{idServico}:
+ *   get:
+ *     summary: Exibir todas as candidaturas de um serviço
+ *     tags:
+ *       - Candidatura
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idServico
+ *         required: true
+ *         description: ID Numerico para buscar todas as candidaturas de um serviço
+ *         schema:
+ *            type: integer
+ *            example: 1
+ *     responses:
+ *       200:
+ *         description: Mostrar todas as candidaturas de um serviço pelo ID do serviço
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: candidatura não encontrado.
+ *       500:
+ *         description: Erro ao editar serviço.
+ */
+router.get('/:idServico', getAllCandidaturasByIdServico);
+
 
 router.use(authenticate);
 /**
