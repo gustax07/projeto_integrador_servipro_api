@@ -47,6 +47,20 @@ router.use(authenticate);
  *                  setorId:
  *                      type: integer
  *                      example: 1
+ *                  imagens:
+ *                      type: array
+ *                      example: [
+ *                         {
+ *                            url: "https://example.com/imagem.png",
+ *                            tipo: "png",
+ *                            principal: true,
+ *                         },
+ *                         {
+ *                            url: "https://example.com/imagem2.png",
+ *                            tipo: "png",
+ *                            principal: false,
+ *                         }
+ *                      ]
  *     responses:
  *       200:
  *         description: Serviço criada com sucesso!

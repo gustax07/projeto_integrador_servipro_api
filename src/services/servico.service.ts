@@ -65,6 +65,13 @@ export const getServicoById = async (id: number, userId: number) => {
                         tipo: true,
                         principal: true
                     }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        icone: true
+                    }
                 }
             }
         })
@@ -108,6 +115,13 @@ export const getAllServicos = async (page: number = 1, limit: number = 20) => {
                         url: true,
                         tipo: true,
                         principal: true
+                    }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        icone: true
                     }
                 }
             }

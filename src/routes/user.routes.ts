@@ -37,6 +37,9 @@ const router = Router();
  *                  documento:
  *                     type: string
  *                     example: "123.456.789-03"
+ *                  icone:
+ *                     type: string
+ *                     example: "https://example.com/icone.png"
  *     responses:
  *       200:
  *         description: Conta criada com sucesso!
@@ -153,6 +156,9 @@ router.get('/', getAllUsers);
  *                  documento:
  *                     type: string
  *                     example: "123.456.789-03"
+ *                  icone:
+ *                     type: string
+ *                     example: "https://example.com/icone.png"
  *     security:
  *       - bearerAuth: []
  *     parameters:
