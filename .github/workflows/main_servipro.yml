@@ -27,7 +27,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '24.x'
- 
+
+      - name: Criar arquivo de credenciais do Firebase
+        run: |
+          echo '${{ secrets.SERVIPRO_FIREBASE_ADMINSDK }}' > servipro-firebase-adminsdk.json
+
       - name: Install dependencies
         run: npm install
  
