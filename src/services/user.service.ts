@@ -7,7 +7,9 @@ import { AppError } from '../utils/AppError';
 
 export const createUser = async (data: Prisma.UserCreateInput) => {
     try {
-        const hashedPassword = await bcrypt.hash(data.senha, 10);
+        const hashedPassword = (data.senha !== null && data.senha !== undefined)
+            ? await bcrypt.hash(data.senha, 10)
+            : null;
         return await prisma.user.create({
             data: {
                 ...data,
