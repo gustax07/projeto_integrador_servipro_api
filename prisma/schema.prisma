@@ -12,9 +12,11 @@ model User {
   id                  Int           @id @default(autoincrement())
   nome                String
   email               String        @unique
-  senha               String
+  senha               String?
   dataNascimento      DateTime      @map("data_nascimento") @db.Date
-  documento           String        @unique
+  provider            String        @default("local")
+  firebaseId          String?       @unique
+  documento           String?       @unique
   icone               String?       @db.VarChar
   avaliacoesEnviadas  Avaliacao[]   @relation("AvaliacoesEnviadas")
   avaliacoesRecebidas Avaliacao[]   @relation("AvaliacoesRecebidas")

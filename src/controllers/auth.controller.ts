@@ -16,3 +16,14 @@ export const login = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Erro ao autenticar usuário" });
     }
 }
+
+export const googleAuth = async (req: Request, res: Response) => {
+    try {
+        const { email, firebase, nome, icone } = req.body;
+        const token = await authService.autenticarUsuarioGoogle(email, firebase, nome, icone);
+        return res.status(200).json({ token });
+    } catch (error: any) {
+        Logger.error("Erro ao autenticar usuário com Google", error);
+        return res.status(500).json({ error: "Erro ao autenticar usuário com Google" });
+    }
+}
