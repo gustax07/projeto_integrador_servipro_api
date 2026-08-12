@@ -45,7 +45,7 @@ export const autenticarUsuarioGoogle = async (email: string, firebase: string, n
     });
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { id: user.id, email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
     );

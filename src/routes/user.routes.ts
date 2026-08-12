@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, getUserById, getAllUsers, updateUser, deleteUser } from "../controllers/user.controller";
+import { createUser, getUserById, getAllUsers, updateUser, deleteUser, getIconeByIcone } from "../controllers/user.controller";
 import { validateSchema } from "../middleware/validate.middlware";
 import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { authLimiter } from '../middleware/rateLimiter.middleware';
@@ -123,6 +123,38 @@ router.get('/:id', getUserById);
  */
 
 router.get('/', getAllUsers);
+
+// ----------------------------- Pegar icone do usuario pelo ID -------------------------------- \\
+
+/**
+ * @openapi
+ * /user/icone/{icone}:
+ *   get:
+ *     summary: Pegar icone do usuario por Nome
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: icone
+ *         required: true
+ *         description: Nome do icone para buscar o icone do usuario
+ *         schema:
+ *            type: string
+ *            example: "icone.png"
+ *     responses:
+ *       200:
+ *         description: Icone do usuario
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Usuário não encontrado.
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+
+router.get('/icone/:icone', getIconeByIcone);
 
 // ----------------------------- Editar o Usuario pelo ID -------------------------------- \\
 

@@ -12,6 +12,12 @@ export const getUserById = async (req: Request, res: Response) => {
     return res.status(200).json({ user });
 }
 
+export const getIconeByIcone = async (req: Request, res: Response) => {
+    const { icone } = req.params;
+    const iconee = await userService.getIconeByIcone(icone ? String(icone) : String(undefined));
+    return res.status(200).json({ iconee });
+}
+
 export const getAllUsers = async (req: Request, res: Response) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 20;

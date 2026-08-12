@@ -71,6 +71,26 @@ export const getAllUsers = async (page: number = 1, limit: number = 20) => {
     }
 }
 
+export const getIconeByIcone = async (icone: string) => {
+    try {
+        const user = await prisma.user.findMany({
+            where: {
+                icone: icone
+            },
+            select: {
+                icone: true
+            }
+        })
+
+        if (user.length === 0) {
+            throw new AppError('Icone não encontrado.', 404)
+        }
+        return user;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
     try {
         const dataToUpdate: Prisma.UserUpdateInput = { ...data };
