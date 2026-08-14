@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import * as userService from '../services/user.service';
+import { AuthRequest } from "../middleware/auth.middleware";
 
 export const createUser = async (req: Request, res: Response) => {
     await userService.createUser(req.body);
@@ -14,8 +15,16 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const getIconeByIcone = async (req: Request, res: Response) => {
     const { icone } = req.params;
-    const iconee = await userService.getIconeByIcone(icone ? String(icone) : String(undefined));
-    return res.status(200).json({ iconee });
+    const imagem = await userService.getIconeByIcone(icone ? String(icone) : String(undefined));
+    return res.status(200).json({ imagem});
+}
+
+export const saveIcone = async (req: AuthRequest & { file?: Express.Multer.File }, res: Response) => {
+    if (!req.file) { return res.status(400).json({ 'status': 'error', 'message': 'nenhum arquivo foi enviado!' }); }
+    if (!req.userId) { return res.status(401).json({ error: 'Usuário não autenticado.' }); }
+    const icone = `uploads/icones_perfis/${req.file.filename}`;
+    const imagem = await userService.saveIcone(req.userId, icone);
+    return res.status(200).json({ imagem });
 }
 
 export const getAllUsers = async (req: Request, res: Response) => {

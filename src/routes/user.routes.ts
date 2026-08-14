@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { createUser, getUserById, getAllUsers, updateUser, deleteUser, getIconeByIcone } from "../controllers/user.controller";
+import { createUser, getUserById, getAllUsers, updateUser, deleteUser, getIconeByIcone, saveIcone } from "../controllers/user.controller";
 import { validateSchema } from "../middleware/validate.middlware";
 import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { authLimiter } from '../middleware/rateLimiter.middleware';
 import { authenticate } from "../middleware/auth.middleware";
+import { uploadIcone } from "../config/icone_upload";
 
 const router = Router();
 
@@ -155,6 +156,40 @@ router.get('/', getAllUsers);
  */
 
 router.get('/icone/:icone', getIconeByIcone);
+
+
+// ----------------------------- Salvar icone do usuario pelo ID -------------------------------- \\
+
+/**
+ * @openapi
+ * /user/icone/{id}:
+ *   post:
+ *     summary: Salvar icone do usuario pelo ID
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *             schema:
+ *              type: object
+ *              properties:
+ *                  icone:
+ *                    type: file
+ *     responses:
+ *       200:
+ *         description: Icone salvo com sucesso!
+ *       401:
+ *         description: Token de autenticação não fornecido no cabeçalho.
+ *       404:
+ *         description: Usuário não encontrado.
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+
+router.post('/icone/:id', uploadIcone.single('icone'), saveIcone);
 
 // ----------------------------- Editar o Usuario pelo ID -------------------------------- \\
 

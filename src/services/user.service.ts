@@ -91,6 +91,25 @@ export const getIconeByIcone = async (icone: string) => {
     }
 }
 
+export const saveIcone = async (id: number, icone: string) => {
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                icone
+            },
+            select: {
+                id: true,
+            }
+        });
+        return user;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
     try {
         const dataToUpdate: Prisma.UserUpdateInput = { ...data };
