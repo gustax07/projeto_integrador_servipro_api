@@ -1,6 +1,8 @@
 import { Response, Request } from "express";
 import * as userService from '../services/user.service';
 import { AuthRequest } from "../middleware/auth.middleware";
+import path from "path";
+import fs from "fs";
 
 export const createUser = async (req: Request, res: Response) => {
     await userService.createUser(req.body);
@@ -14,9 +16,16 @@ export const getUserById = async (req: Request, res: Response) => {
 }
 
 export const getIconeByIcone = async (req: Request, res: Response) => {
-    const { icone } = req.params;
-    const imagem = await userService.getIconeByIcone(icone ? String(icone) : String(undefined));
-    return res.status(200).json({ imagem});
+    const { id } = req.params;
+    const imagem = await userService.getIconeByIcone(Number(id));
+    if (!imagem || !imagem.icone) {
+        return res.status(404).json({ 'status': 'error', 'message': 'nenhuma imagem encontrada!' });
+    }
+    const caminho_completo = path.join(process.cwd(), imagem.icone);
+    if (!fs.existsSync(caminho_completo)) {
+        return res.status(404).json({ 'status': 'error', 'message': 'nenhuma imagem encontrada!' });
+    }
+    return res.status(200).sendFile(caminho_completo);
 }
 
 export const saveIcone = async (req: AuthRequest & { file?: Express.Multer.File }, res: Response) => {

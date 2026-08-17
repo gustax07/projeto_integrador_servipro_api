@@ -2,16 +2,14 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { Request } from 'express';
+import { AuthRequest } from '../middleware/auth.middleware';
 
-// Define a pasta onde as imagens serão salvas
 const uploadDir = path.join(process.cwd(), 'uploads/icones_perfis');
 
-// Cria a pasta caso não exista
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configuração do armazenamento local (DiskStorage)
 const storage = multer.diskStorage({
   destination: (
     req: Request,
@@ -21,17 +19,16 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (
-    req: Request,
+    req: AuthRequest,
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const userId = (req as AuthRequest).userId;
     const extensao = path.extname(file.originalname);
-    cb(null, `icone-${uniqueSuffix}${extensao}`);
+    cb(null, `icone-${userId}${extensao}`);
   }
 });
 
-// Filtro opcional para aceitar apenas imagens (Segurança)
 const fileFilter = (
   req: Request,
   file: Express.Multer.File,
@@ -45,9 +42,8 @@ const fileFilter = (
   }
 };
 
-// Exporta o middleware configurado
 export const uploadIcone = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: fileFilter
 });

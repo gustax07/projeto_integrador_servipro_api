@@ -129,7 +129,7 @@ router.get('/', getAllUsers);
 
 /**
  * @openapi
- * /user/icone/{icone}:
+ * /user/icone/{id}:
  *   get:
  *     summary: Pegar icone do usuario por Nome
  *     tags:
@@ -138,12 +138,12 @@ router.get('/', getAllUsers);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: icone
+ *         name: id
  *         required: true
  *         description: Nome do icone para buscar o icone do usuario
  *         schema:
- *            type: string
- *            example: "icone.png"
+ *            type: integer
+ *            example: "1"
  *     responses:
  *       200:
  *         description: Icone do usuario
@@ -155,14 +155,14 @@ router.get('/', getAllUsers);
  *         $ref: '#/components/responses/InternalServerError'
  */
 
-router.get('/icone/:icone', getIconeByIcone);
+router.get('/icone/:id', getIconeByIcone);
 
 
 // ----------------------------- Salvar icone do usuario pelo ID -------------------------------- \\
 
 /**
  * @openapi
- * /user/icone/{id}:
+ * /user/icone:
  *   post:
  *     summary: Salvar icone do usuario pelo ID
  *     tags:
@@ -189,7 +189,7 @@ router.get('/icone/:icone', getIconeByIcone);
  *         $ref: '#/components/responses/InternalServerError'
  */
 
-router.post('/icone/:id', uploadIcone.single('icone'), saveIcone);
+router.post('/icone/', uploadIcone.single('icone'), saveIcone);
 
 // ----------------------------- Editar o Usuario pelo ID -------------------------------- \\
 
